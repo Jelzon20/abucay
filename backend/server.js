@@ -13,16 +13,16 @@ import officialRoutes from './routes/officials.routes.js'
 import certRoutes from './routes/certificates.route.js'
 
 import path from "path";
-import { fileURLToPath } from "url";
+// import { fileURLToPath } from "url";
 
-// Setup __dirname in ESM
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+
 
 dotenv.config();
 
+const __dirname = path.resolve();
 const app = express();
 app.use(express.json());
+
 
 // API Routes
 app.use("/api/residents", residentRoutes);
@@ -36,19 +36,20 @@ app.use("/api/activities", activityRoutes);
 app.use("/api/officials", officialRoutes);
 app.use("/api/certs", certRoutes);
 
-// Serve static frontend
-const clientDistPath = path.join(__dirname, "..", "client", "dist");
-app.use(express.static(clientDistPath));
+app.use(express.static(path.join(__dirname, '../client/dist')));
 
-app.get("*", (req, res) => {
-  res.sendFile(path.join(clientDistPath, "index.html"));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '..', 'client', 'dist', 'index.html'));
 });
 
-// Error Handler
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;
-  const message = err.message || "Internal Server Error";
-  res.status(statusCode).json({ success: false, statusCode, message });
+  const message = err.message || 'Internal Server Error';
+  res.status(statusCode).json({
+    success: false,
+    statusCode,
+    message
+  })
 });
 
 // Connect to DB and start server
