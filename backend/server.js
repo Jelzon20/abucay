@@ -1,6 +1,5 @@
 import express from "express";
 import mongoose from "mongoose";
-import cors from "cors";
 import dotenv from "dotenv";
 import residentRoutes from "./routes/resident.route.js";
 import documentRoutes from "./routes/document.route.js";
@@ -13,12 +12,19 @@ import activityRoutes from './routes/activity.routes.js'
 import officialRoutes from './routes/officials.routes.js'
 import certRoutes from './routes/certificates.route.js'
 
+import path from "path";
+import { fileURLToPath } from "url";
+
+// Setup __dirname in ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 dotenv.config();
 
 const app = express();
-// app.use(cors());
 app.use(express.json());
 
+// API Routes
 app.use("/api/residents", residentRoutes);
 app.use("/api/documents", documentRoutes);
 app.use("/api/establishments", establishmentRoutes);
@@ -30,6 +36,22 @@ app.use("/api/activities", activityRoutes);
 app.use("/api/officials", officialRoutes);
 app.use("/api/certs", certRoutes);
 
+// Serve static frontend
+const clientDistPath = path.join(__dirname, "..", "client", "dist");
+app.use(express.static(clientDistPath));
+
+app.get("*", (req, res) => {
+  res.sendFile(path.join(clientDistPath, "index.html"));
+});
+
+// Error Handler
+app.use((err, req, res, next) => {
+  const statusCode = err.statusCode || 500;
+  const message = err.message || "Internal Server Error";
+  res.status(statusCode).json({ success: false, statusCode, message });
+});
+
+// Connect to DB and start server
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => {
