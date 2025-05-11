@@ -11,7 +11,7 @@ const router = express.Router();
 
 router.post('/addCertificate', createCertificate);
 router.get('/getCertificates', getCertificates);
-router.get('/:id', getCertificateById);
+router.get('/getCertificate/:id', getCertificateById);
 router.put('/updateCertificate/:id', updateCertificate);
 router.delete('/deleteCertificate/:id', deleteCertificate);
 
