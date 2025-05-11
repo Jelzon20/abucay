@@ -1,0 +1,29 @@
+@import "tailwindcss";
+@plugin "flowbite-react/plugin/tailwindcss";
+@source "../.flowbite-react/class-list.json";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+a {
+    @apply text-inherit no-underline;
+  }
+  @media print {
+    html, body {
+      height: 100vh; /* Use 100% here to support printing more than a single page*/
+      margin: 0 !important;
+      padding: 0 !important;
+      overflow: hidden;
+    }
+  }
+  @page {
+    /* size: 50mm 150mm; */
+    margin: 40px;
+  }
+  .printContent {
+    display: none;
+  
+    @media print {
+      display: block;
+    }
+  }
+  
