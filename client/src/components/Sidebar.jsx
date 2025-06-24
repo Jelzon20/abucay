@@ -50,7 +50,7 @@ const Sidebar = () => {
       icon: <BuildingStorefrontIcon className="h-5 w-5 mr-2" />,
     },
     {
-      name: "Pedicabs",
+      name: "Vehicle Registration",
       path: "/dashboard/pedicabs",
       icon: <LifebuoyIcon className="h-5 w-5 mr-2" />,
     },
@@ -58,6 +58,16 @@ const Sidebar = () => {
       name: "Lupon",
       path: "/dashboard/lupon",
       icon: <BriefcaseIcon className="h-5 w-5 mr-2" />,
+    },
+    {
+      name: "Barangay Disputes",
+      path: "/dashboard/brgyDisputes",
+      icon: <BriefcaseIcon className="h-5 w-5 mr-2" />,
+    },
+    {
+      name: "Lupon Members",
+      path: "/dashboard/luponMembers",
+      icon: <UserIcon className="h-5 w-5 mr-2" />,
     },
     {
       name: "Blotters",

@@ -5,7 +5,8 @@ import {
     updateResident,
     deleteResident,
     testResidentAPI,
-    getResidentsPerMonth
+    getResidentsPerMonth,
+    getResidentsInSameHousehold
   } from '../controllers/resident.controller.js';
 const router = express.Router();
 
@@ -15,7 +16,7 @@ router.get('/getResidentsPerMonth', getResidentsPerMonth);
 router.post('/createResident', createResident);
 router.put('/updateResident/:id', updateResident);
 router.delete('/deleteResident/:id', deleteResident);
-
+router.get("/sameHousehold/:id", getResidentsInSameHousehold);
 
 
 

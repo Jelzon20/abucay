@@ -22,6 +22,8 @@ import BarangayOfficialsTab from "./DashboardPages/BarangayOfficialsTab";
 import OrgChart from "./pages/OrgChart";
 import ServicesPage from "./pages/ServicesPage";
 import Footer from "./components/Footer";
+import LuponMemberTab from "./DashboardPages/LuponMemberTab";
+import BrgyDisputesTab from "./DashboardPages/BrgyDisputesTab";
 
 function App() {
   return (
@@ -41,6 +43,8 @@ function App() {
               <Route path="establishments" element={<EstablishmentTab />} />
               <Route path="pedicabs" element={<PedicabTab />} />
               <Route path="lupon" element={<LuponTab />} />
+              <Route path="brgyDisputes" element={<BrgyDisputesTab />} />
+              <Route path="luponMembers" element={<LuponMemberTab />} />
               <Route path="blotters" element={<BlotterTab />} />
               <Route path="organizations" element={<OrganizationTab />} />
               <Route path="activities" element={<ActivityTab />} />

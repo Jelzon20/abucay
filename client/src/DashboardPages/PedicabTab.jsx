@@ -132,7 +132,7 @@ const PedicabTab = () => {
 
       <div className="max-w-full mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 space-y-6">
         <div className="flex flex-col md:flex-row justify-between gap-4 items-start md:items-center">
-          <Button onClick={() => setShowAddModal(true)}> + Add Pedicab</Button>
+          <Button onClick={() => setShowAddModal(true)}> + Add Vehicle</Button>
           <div className="flex flex-wrap gap-3">
             <input
               type="text"

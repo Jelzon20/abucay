@@ -29,7 +29,9 @@ const LuponTab = () => {
   const columns = [
     { label: "Defendant", key: "defendant" },
     { label: "Complainant", key: "complainant" },
+    { label: "Complaint", key: "complaint" },
     { label: "Description", key: "description" },
+    { label: "Lupon Members", key: "luponMembers" },
     { label: "Schedule of Hearing", key: "scheduleOfHearing" },
     { label: "Status", key: "status" },
   ];
@@ -158,7 +160,7 @@ const LuponTab = () => {
 
       <div className="max-w-full mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 space-y-6">
         <div className="flex flex-col md:flex-row justify-between gap-4 items-start md:items-center">
-          <Button onClick={() => setShowAddModal(true)}> + Add Lupon</Button>
+          {/* <Button onClick={() => setShowAddModal(true)}> + Add Lupon</Button> */}
           <div className="flex flex-wrap gap-3">
             <input
               type="text"
@@ -212,10 +214,18 @@ const LuponTab = () => {
                   >
                     <td className="px-6 py-3">{lupon.defendant}</td>
                     <td className="px-6 py-3">{lupon.complainant}</td>
+                    <td className="px-6 py-3">{lupon.complaint}</td>
                     <td className="px-6 py-3">{lupon.description}</td>
+                    <td className="px-6 py-3">
+                      {" "}
+                      {lupon.luponMembers.map((member) => (
+                        <span key={member._id}>{member.name}, </span>
+                      ))}
+                    </td>
                     <td className="px-6 py-3">
                       {formatDateForInput(lupon.scheduleOfHearing) || ""}
                     </td>
+
                     <td className="px-6 py-3">{lupon.status}</td>
                     <td className="px-6 py-3 flex gap-2">
                       <button

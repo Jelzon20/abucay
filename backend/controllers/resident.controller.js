@@ -82,3 +82,26 @@ export const getResidentsPerMonth = async (req, res, next) => {
     next(errorHandler(500, "Failed to fetch residents per month"));
   }
 };
+
+export const getResidentsInSameHousehold = async (req, res) => {
+  try {
+    const targetId = req.params.id;
+
+    const targetResident = await Resident.findById(targetId);
+    if (!targetResident) {
+      return res.status(404).json({ message: "Resident not found" });
+    }
+
+    const sameHousehold = await Resident.find({
+      household_no: targetResident.household_no,
+      _id: { $ne: targetResident._id }
+    });
+
+    res.json({
+      target: targetResident,
+      othersInSameHousehold: sameHousehold
+    });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+};

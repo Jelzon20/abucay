@@ -9,6 +9,7 @@ import AddResidentModal from "../modals/AddResidentModal";
 import UpdateResidentModal from "../modals/UpdateResidentModal";
 import LoadingSpinner from "../components/LoadingSpinner";
 import DeleteResidentModal from "../modals/DeleteResidentModal";
+import ViewHouseholdModal from "../modals/ViewHouseholdModal";
 
 const ResidentsPage = () => {
   const [residents, setResidents] = useState([]);
@@ -20,6 +21,8 @@ const ResidentsPage = () => {
   const [deleteModal, setDeleteModal] = useState(null);
   const itemsPerPage = 10;
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [showViewModal, setShowViewModal] = useState(false);
+  const [viewData, setViewData] = useState(null); // for resident object
   const [editModal, setEditModal] = useState(null); // for resident object
   const [isLoading, setIsLoading] = useState(false);
   const [filterPurok, setFilterPurok] = useState("");
@@ -171,6 +174,11 @@ const ResidentsPage = () => {
     }
   };
 
+  const handleView = (resident) => {
+    setViewData(resident);
+    setShowViewModal(true);
+  };
+
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6">
       <Toaster richColors position="top-center" expand={true} />
@@ -294,6 +302,12 @@ const ResidentsPage = () => {
                     <td className="px-6 py-3">{resident.cur_address}</td>
                     <td className="px-6 py-3 flex gap-2">
                       <button
+                        onClick={() => handleView(resident)}
+                        className="text-green-600 hover:text-green-800 dark:text-blue-300 dark:hover:text-blue-500"
+                      >
+                        View Household
+                      </button>
+                      <button
                         onClick={() => setEditModal(resident)}
                         className="text-blue-600 hover:text-blue-800 dark:text-blue-300 dark:hover:text-blue-500"
                       >
@@ -341,6 +355,19 @@ const ResidentsPage = () => {
         <div className="mt-2 font-semibold text-gray-700">
           Total Residents Found: {totalResidents}
         </div>
+
+        {/* View Modal */}
+        {showViewModal && (
+          <ViewHouseholdModal
+            show={showViewModal}
+            onClose={() => setShowViewModal(null)}
+            viewData={viewData}
+            onUpdated={() => {
+              setViewData(null);
+              fetchResidents();
+            }}
+          />
+        )}
 
         {/* Edit Modal */}
         {editModal && (

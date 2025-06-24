@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { Dialog } from "@headlessui/react";
-import { TextInput, Button } from "flowbite-react";
+import { TextInput, Button, Select } from "flowbite-react";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { toast, Toaster } from "sonner";
 // import { storage } from "../firebase"; // adjust path as needed
@@ -10,6 +10,8 @@ const AddEstablishmentModal = ({ show, onClose, onSubmit }) => {
   const [form, setForm] = useState({
     establishment: "",
     description: "",
+    address: "",
+    establishment_type: "",
     owner: "",
     dateEstablished: null,
   });
@@ -37,6 +39,8 @@ const AddEstablishmentModal = ({ show, onClose, onSubmit }) => {
         onSubmit();
         setForm({
           establishment: "",
+          establishment_type: "",
+          address: "",
           description: "",
           owner: "",
           dateEstablished: null,
@@ -83,6 +87,27 @@ const AddEstablishmentModal = ({ show, onClose, onSubmit }) => {
               </div>
               <div className="mb-4">
                 <label
+                  htmlFor="type"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Establishment Type
+                </label>
+                <Select
+                  id="establishment_type"
+                  value={form.establishment_type}
+                  onChange={handleChange}
+                  className="block w-full text-sm border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring focus:ring-blue-300"
+                >
+                  <option value="">Select Establishment Type</option>
+                  <option value="Business">Business</option>
+                  <option value="Church">Church</option>
+                  <option value="Hospital">Hospital</option>
+                  <option value="Office">Office</option>
+                  <option value="School">School</option>
+                </Select>
+              </div>
+              <div className="mb-4">
+                <label
                   htmlFor="description"
                   className="block text-sm font-medium text-gray-700 mb-2"
                 >
@@ -106,6 +131,21 @@ const AddEstablishmentModal = ({ show, onClose, onSubmit }) => {
                 <TextInput
                   id="owner"
                   value={form.owner}
+                  type="text"
+                  onChange={handleChange}
+                  className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                />
+              </div>
+              <div className="mb-4">
+                <label
+                  htmlFor="address"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Address
+                </label>
+                <TextInput
+                  id="address"
+                  value={form.address}
                   type="text"
                   onChange={handleChange}
                   className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"

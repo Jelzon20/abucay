@@ -5,6 +5,12 @@ const establishmentSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  establishment_type: {
+    type: String,
+  },
+  address:{
+    type: String,
+  },
   description: {
     type: String,
   },

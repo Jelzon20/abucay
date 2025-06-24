@@ -1,22 +1,21 @@
 import mongoose from "mongoose";
 
 const luponSchema = new mongoose.Schema({
-  defendant: {
-    type: String,
-    required: true,
+   defendant: { type: String, required: true },
+  complainant: { type: String, required: true },
+  complaint: { type: String, required: true },
+  description: { type: String },
+  endorsedFromDisputeId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'BrgyDispute',
   },
-  complainant: {
-    type: String,
-    required: true,
-  },
-  description: {
-    type: String,
-    required: true,
-  },
-  scheduleOfHearing: {
-    type: Date,
-    required: true,
-  },
+  luponMembers: [
+    {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'LuponMember',
+    }
+  ],
+  scheduleOfHearing: { type: Date },
   status: {
     type: String,
   },

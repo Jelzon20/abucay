@@ -372,7 +372,7 @@ const AddResidentModal = ({ isOpen, onClose, onAddResident }) => {
                   <Tabs.Item title="Civil & Family Status">
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                       <div>
-                        <Label className="mb-2 block">Relationship</Label>
+                        <Label className="mb-2 block">Family Role</Label>
                         <Select
                           name="relationship"
                           value={formData.relationship}
@@ -427,7 +427,6 @@ const AddResidentModal = ({ isOpen, onClose, onAddResident }) => {
                           <option value="Single">Single</option>
                           <option value="Married">Married</option>
                           <option value="Widowed">Widowed</option>
-                          <option value="Divorced">Divorced</option>
                         </Select>
                       </div>
                     </div>

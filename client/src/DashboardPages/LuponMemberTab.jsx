@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Modal, Button, TextInput, Select } from "flowbite-react";
-import AddEstablishmentModal from "../modals/AddEstablishmentModal";
+import { Modal, Button, TextInput } from "flowbite-react";
 import { toast, Toaster } from "sonner";
 import LoadingSpinner from "../components/LoadingSpinner";
 import {
@@ -8,12 +7,13 @@ import {
   PencilIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
-import UpdateEstablishmentModal from "../modals/UpdateEstablishmentModal";
-import DeleteEstablishmentModal from "../modals/DeleteEstablishmentModal";
+import AddLuponMemberModal from "../modals/AddLuponMemberModal";
+import UpdateLuponMemberModal from "../modals/UpdateLuponMemberModal";
+import DeleteLuponMemberModal from "../modals/deleteLuponMemberModal";
 
-const EstablishmentTab = () => {
+const LuponMemberTab = () => {
   const [showAddModal, setShowAddModal] = useState(false);
-  const [establishments, setEstablishments] = useState([]);
+  const [lupons, setLupons] = useState([]);
   const [sortField, setSortField] = useState("name");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -27,31 +27,27 @@ const EstablishmentTab = () => {
   const [deleteData, setDeleteData] = useState(null); // data to edit
 
   const columns = [
-    { label: "Establishment", key: "establishment" },
-    { label: "Type", key: "establishment_type" },
-    { label: "Description", key: "description" },
-    { label: "Owner", key: "owner" },
-    { label: "Date Established", key: "dateEstablished" },
+    { label: "Name", key: "name" },
+    { label: "Contact Number", key: "contact_number" },
   ];
-  const fetchEstablishments = async () => {
+
+  const fetchLuponMembers = async () => {
     setIsLoading(true);
-    const res = await fetch("/api/establishments/getEstablishments");
+    const res = await fetch("/api/luponMembers/getAllLuponMembers");
     const data = await res.json();
-    setEstablishments(data);
+    setLupons(data);
     setIsLoading(false);
   };
 
   useEffect(() => {
-    fetchEstablishments();
+    fetchLuponMembers();
   }, []);
 
-  const filtered = establishments.filter((establishment) => {
+  const filtered = lupons.filter((lupon) => {
     const fullText = `
-      ${establishment.establishment}
-      ${establishment.description}
-      ${establishment.owner}
-      ${establishment.dateEstablished}
-    `
+        ${lupon.name}
+        ${lupon.contact_number}
+      `
       .toLowerCase()
       .replace(/\s+/g, " ");
 
@@ -108,7 +104,7 @@ const EstablishmentTab = () => {
     )}`;
     const timePart = `${pad(now.getHours())}-${pad(now.getMinutes())}`;
 
-    const filename = `residents-${datePart} ${timePart}.csv`;
+    const filename = `luponMembers-${datePart} ${timePart}.csv`;
 
     const link = document.createElement("a");
     link.setAttribute("href", url);
@@ -117,16 +113,38 @@ const EstablishmentTab = () => {
     link.click();
     document.body.removeChild(link);
   };
-  const handleDelete = (establishment) => {
-    setDeleteData(establishment);
+  const handleDelete = (lupon) => {
+    setDeleteData(lupon);
     setDeleteModalOpen(true);
   };
 
-  const handleUpdate = (establishment) => {
-    setEditData(establishment);
+  const handleUpdate = (lupon) => {
+    setEditData(lupon);
     setEditModalOpen(true);
   };
+  const formatDateForInput = (dateString) => {
+    if (!dateString) return "";
 
+    const date = new Date(dateString);
+    if (isNaN(date.getTime())) {
+      console.error("Invalid date string:", dateString);
+      return "";
+    }
+
+    const pad = (n) => n.toString().padStart(2, "0");
+
+    const year = date.getFullYear();
+    const month = pad(date.getMonth() + 1);
+    const day = pad(date.getDate());
+
+    let hours = date.getHours();
+    const minutes = pad(date.getMinutes());
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12;
+    hours = hours ? hours : 12; // 0 should be 12
+
+    return `${year}-${month}-${day} ${hours}:${minutes} ${ampm}`;
+  };
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6">
       <Toaster richColors position="top-center" expand={true} />
@@ -134,9 +152,8 @@ const EstablishmentTab = () => {
       <div className="max-w-full mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 space-y-6">
         <div className="flex flex-col md:flex-row justify-between gap-4 items-start md:items-center">
           <Button onClick={() => setShowAddModal(true)}>
-            + Add Establishment
+            + Add Lupon Member
           </Button>
-
           <div className="flex flex-wrap gap-3">
             <input
               type="text"
@@ -183,29 +200,22 @@ const EstablishmentTab = () => {
                 </tr>
               </thead>
               <tbody>
-                {paginated.map((establishment) => (
+                {paginated.map((member) => (
                   <tr
-                    key={establishment._id}
+                    key={member._id}
                     className="border-t hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                   >
-                    <td className="px-6 py-3">{establishment.establishment}</td>
-                    <td className="px-6 py-3">
-                      {establishment.establishment_type}
-                    </td>
-                    <td className="px-6 py-3">{establishment.description}</td>
-                    <td className="px-6 py-3">{establishment.owner}</td>
-                    <td className="px-6 py-3">
-                      {establishment.dateEstablished?.slice(0, 10) || ""}
-                    </td>
+                    <td className="px-6 py-3">{member.name}</td>
+                    <td className="px-6 py-3">{member.contact_number}</td>
                     <td className="px-6 py-3 flex gap-2">
                       <button
-                        onClick={() => handleUpdate(establishment)}
+                        onClick={() => handleUpdate(member)}
                         className="text-blue-600 hover:text-blue-800 dark:text-blue-300 dark:hover:text-blue-500"
                       >
                         <PencilIcon className="h-5 w-5" />
                       </button>
                       <button
-                        onClick={() => handleDelete(establishment)}
+                        onClick={() => handleDelete(member)}
                         className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-500"
                       >
                         <TrashIcon className="h-5 w-5" />
@@ -217,49 +227,47 @@ const EstablishmentTab = () => {
             </table>
           </div>
         )}
+        {showAddModal && (
+          <AddLuponMemberModal
+            show={showAddModal}
+            onClose={() => setShowAddModal(false)}
+            onSubmit={() => {
+              toast.success("New lupon member saved!");
+              fetchLuponMembers();
+              setShowAddModal(false);
+            }}
+          />
+        )}
+        {/* Update Document Modal */}
+        {editModalOpen && editData && (
+          <UpdateLuponMemberModal
+            show={editModalOpen}
+            onClose={() => setEditModalOpen(false)}
+            editData={editData}
+            setEditData={setEditData}
+            onSubmit={() => {
+              toast.success("Record has been updated.");
+              fetchLuponMembers();
+              setEditModalOpen(false);
+            }}
+          />
+        )}
+        {deleteModalOpen && (
+          <DeleteLuponMemberModal
+            show={deleteModalOpen}
+            onClose={() => setDeleteModalOpen(false)}
+            deleteData={deleteData}
+            setDeleteData={setDeleteData}
+            onConfirm={() => {
+              toast.success("Record has been deleted.");
+              fetchLuponMembers();
+              setDeleteModalOpen(false);
+            }}
+          />
+        )}
       </div>
-
-      {showAddModal && (
-        <AddEstablishmentModal
-          show={showAddModal}
-          onClose={() => setShowAddModal(false)}
-          onSubmit={() => {
-            toast.success("Establishment saved!");
-            fetchEstablishments();
-            setShowAddModal(false);
-          }}
-        />
-      )}
-
-      {/* Update Document Modal */}
-      {editModalOpen && editData && (
-        <UpdateEstablishmentModal
-          show={editModalOpen}
-          onClose={() => setEditModalOpen(false)}
-          editData={editData}
-          setEditData={setEditData}
-          onSubmit={() => {
-            toast.success("Record has been updated.");
-            fetchEstablishments();
-            setEditModalOpen(false);
-          }}
-        />
-      )}
-      {deleteModalOpen && (
-        <DeleteEstablishmentModal
-          show={deleteModalOpen}
-          onClose={() => setDeleteModalOpen(false)}
-          deleteData={deleteData}
-          setDeleteData={setDeleteData}
-          onConfirm={() => {
-            toast.success("Record has been deleted.");
-            fetchEstablishments();
-            setDeleteModalOpen(false);
-          }}
-        />
-      )}
     </div>
   );
 };
 
-export default EstablishmentTab;
+export default LuponMemberTab;

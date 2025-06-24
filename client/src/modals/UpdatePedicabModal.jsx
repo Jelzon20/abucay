@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Dialog } from "@headlessui/react";
-import { TextInput, Button } from "flowbite-react";
+import { TextInput, Button, Select } from "flowbite-react";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { toast, Toaster } from "sonner";
 
@@ -19,6 +19,7 @@ const UpdatePedicabModal = ({
     if (editData) {
       setForm({
         number: editData.number || "",
+        vehicle_type: editData.vehicle_type || "",
         owner: editData.owner || "",
         driver: editData.driver || "",
         dateRegistered: editData.dateRegistered?.slice(0, 10) || "",
@@ -92,6 +93,26 @@ const UpdatePedicabModal = ({
                   onChange={handleChange}
                   placeholder="Enter pedicab number"
                 />
+              </div>
+
+              <div className="mb-4">
+                <label
+                  htmlFor="type"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Vehicle Type
+                </label>
+                <Select
+                  id="vehicle_type"
+                  value={form.vehicle_type}
+                  onChange={handleChange}
+                  className="block w-full text-sm border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring focus:ring-blue-300"
+                >
+                  <option value="">Select Vehicle Type</option>
+                  <option value="Dismissed">Electric Bike</option>
+                  <option value="Resolved">Pedicab</option>
+                  <option value="Dismissed">Multicab</option>
+                </Select>
               </div>
 
               <div>

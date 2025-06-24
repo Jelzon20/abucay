@@ -1,102 +1,69 @@
 import React, { useState, useEffect } from "react";
 import { Dialog } from "@headlessui/react";
-import { TextInput, Button, Textarea, Label, Select } from "flowbite-react";
+import { TextInput, Button, Label, Textarea, Select } from "flowbite-react";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { toast, Toaster } from "sonner";
-import LuponMultiSelect from "../components/LuponMultiSelect";
-const UpdateLuponModal = ({
-  show,
-  onClose,
-  editData,
-  setEditData,
-  onSubmit,
-}) => {
-  const [luponMembersList, setLuponMembersList] = useState([]);
 
-  useEffect(() => {
-    fetch("/api/luponMembers/getAllLuponMembers") // adjust this route to your actual API
-      .then((res) => res.json())
-      .then((data) => setLuponMembersList(data))
-      .catch((err) => console.error("Failed to fetch lupon members", err));
-  }, []);
-
-  const formatDateForInput = (dateString) => {
-    if (!dateString) return "";
-
-    const date = new Date(dateString);
-    if (isNaN(date.getTime())) {
-      console.error("Invalid date string:", dateString);
-      return "";
-    }
-
-    const pad = (n) => n.toString().padStart(2, "0");
-
-    const year = date.getFullYear();
-    const month = pad(date.getMonth() + 1);
-    const day = pad(date.getDate());
-    const hours = pad(date.getHours());
-    const minutes = pad(date.getMinutes());
-
-    const formatted = `${year}-${month}-${day}T${hours}:${minutes}`;
-    console.log("Formatted date for input:", formatted);
-    return formatted;
-  };
-
-  const [form, setForm] = useState({});
+const AddBrgyDisputeModal = ({ show, onClose, onSubmit }) => {
+  const [form, setForm] = useState({
+    defendant: "",
+    complainant: "",
+    complaint: "",
+    description: "",
+    date: null,
+    mediatedBy: "",
+    status: "",
+  });
   const [isLoading, setIsLoading] = useState(false);
 
+  const [officials, setOfficials] = useState([]);
+
   useEffect(() => {
-    if (editData) {
-      setForm({
-        defendant: editData.defendant || "",
-        complainant: editData.complainant || "",
-        description: editData.description || "",
-        scheduleOfHearing: formatDateForInput(editData.scheduleOfHearing),
-        status: editData.status || "",
-        luponMembers: Array.isArray(editData.luponMembers)
-          ? editData.luponMembers.map((m) => m._id || m) // ensure it's an array of IDs
-          : [], // fallback to empty array
-      });
-    }
-  }, [editData]);
+    fetch("/api/officials/getOfficials")
+      .then((res) => res.json())
+      .then((data) => setOfficials(data))
+      .catch((err) => console.error(err));
+  }, []);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.id]: e.target.value });
   };
-
   const handleDateChange = (e) => {
-    setForm({ ...form, scheduleOfHearing: e.target.value });
+    setForm({ ...form, date: e.target.value }); // Format: YYYY-MM-DD
   };
-
-  const handleSubmit = async () => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     setIsLoading(true);
     try {
-      const response = await fetch(`/api/lupons/updateLupon/${editData._id}`, {
-        method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          ...form,
-          scheduleOfHearing: new Date(form.scheduleOfHearing).toISOString(),
-        }),
+      const res = await fetch("/api/brgyDisputes/createDispute", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
       });
 
-      if (!response.ok) {
-        throw new Error("Failed to update lupon record.");
-      }
+      const data = await res.json();
 
-      const result = await response.json();
-      onSubmit();
-      onClose();
+      if (res.ok) {
+        onClose();
+        onSubmit();
+        setForm({
+          defendant: "",
+          complainant: "",
+          complaint: "",
+          description: "",
+          date: null,
+          mediatedBy: "",
+          status: "",
+        });
+      } else {
+        toast.error(data.error || "Something went wrong.");
+      }
     } catch (error) {
-      toast.error("Error updating lupon record");
-      console.error("Update error:", error);
+      toast.error("Error saving lupon: " + error.message);
     } finally {
       setIsLoading(false);
     }
   };
-
   return (
     <Dialog open={show} onClose={onClose} className="relative z-50">
       <div className="fixed inset-0 bg-black/30" />
@@ -107,8 +74,9 @@ const UpdateLuponModal = ({
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <Dialog.Panel className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
             <Dialog.Title className="text-lg font-semibold mb-4">
-              Update Lupon
+              Add Brgy Dispute
             </Dialog.Title>
+
             <div className="mb-4">
               <label
                 htmlFor="defendant"
@@ -119,12 +87,13 @@ const UpdateLuponModal = ({
               <TextInput
                 id="defendant"
                 type="text"
-                value={form.defendant || ""}
+                value={form.defendant}
                 onChange={handleChange}
                 className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
                 placeholder="Enter defendant's name"
               />
             </div>
+
             <div className="mb-4">
               <label
                 htmlFor="complainant"
@@ -135,12 +104,30 @@ const UpdateLuponModal = ({
               <TextInput
                 id="complainant"
                 type="text"
-                value={form.complainant || ""}
+                value={form.complainant}
                 onChange={handleChange}
                 className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
                 placeholder="Enter complainant's name"
               />
             </div>
+
+            <div className="mb-4">
+              <label
+                htmlFor="complaint"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Complaint
+              </label>
+              <TextInput
+                id="complaint"
+                type="text"
+                value={form.complaint}
+                onChange={handleChange}
+                className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                placeholder="Enter complaints"
+              />
+            </div>
+
             <div className="mb-4">
               <label
                 htmlFor="description"
@@ -150,7 +137,7 @@ const UpdateLuponModal = ({
               </label>
               <Textarea
                 id="description"
-                value={form.description || ""}
+                value={form.description}
                 onChange={handleChange}
                 rows={4}
                 className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
@@ -159,24 +146,37 @@ const UpdateLuponModal = ({
             </div>
 
             <div className="mb-4">
-              <Label htmlFor="luponMembers">Lupon Members</Label>
-              <LuponMultiSelect
-                allOptions={luponMembersList}
-                selected={form.luponMembers}
-                setSelected={(selectedIds) =>
-                  setForm({ ...form, luponMembers: selectedIds })
-                }
-              />
-            </div>
-            <div className="mb-4">
-              <Label>Schedule of Hearing</Label>
+              <Label>Date</Label>
               <TextInput
                 type="datetime-local"
-                id="scheduleOfHearing"
-                value={form.scheduleOfHearing || ""}
+                id="date"
+                value={form.date}
                 onChange={handleDateChange}
               />
             </div>
+
+            <div className="mb-4">
+              <label
+                htmlFor="mediatedBy"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Mediated by
+              </label>
+              <Select
+                id="mediatedBy"
+                value={form.mediatedBy}
+                onChange={handleChange}
+                className="block w-full text-sm border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring focus:ring-blue-300"
+              >
+                <option value="">Select Mediator</option>
+                {officials.map((official) => (
+                  <option key={official._id} value={official.name}>
+                    {official.name} ({official.position})
+                  </option>
+                ))}
+              </Select>
+            </div>
+
             <div className="mb-4">
               <label
                 htmlFor="status"
@@ -186,10 +186,11 @@ const UpdateLuponModal = ({
               </label>
               <Select
                 id="status"
-                value={form.status || ""}
+                value={form.status}
                 onChange={handleChange}
                 className="block w-full text-sm border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring focus:ring-blue-300"
               >
+                <option value="">Select status</option>
                 <option value="Pending - First Hearing">
                   Pending - First Hearing
                 </option>
@@ -208,9 +209,11 @@ const UpdateLuponModal = ({
                 <option value="Resolved - Third Hearing">
                   Resolved - Third Hearing
                 </option>
+                <option value="Endorsed">Endorsed</option>
                 <option value="Dismissed">Dismissed</option>
               </Select>
             </div>
+
             <div className="mt-6 flex justify-end gap-2">
               <Button onClick={handleSubmit}>Submit</Button>
               <Button color="gray" onClick={onClose}>
@@ -224,4 +227,4 @@ const UpdateLuponModal = ({
   );
 };
 
-export default UpdateLuponModal;
+export default AddBrgyDisputeModal;

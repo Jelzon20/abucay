@@ -147,7 +147,15 @@ const AddLuponModal = ({ show, onClose, onSubmit }) => {
                 <option value="Pending - Third Hearing">
                   Pending - Third Hearing
                 </option>
-                <option value="Resolved">Resolved</option>
+                <option value="Resolved - First Hearing">
+                  Resolved - First Hearing
+                </option>
+                <option value="Resolved - Second Hearing">
+                  Resolved - Second Hearing
+                </option>
+                <option value="Resolved - Third Hearing">
+                  Resolved - Third Hearing
+                </option>
                 <option value="Dismissed">Dismissed</option>
               </Select>
             </div>

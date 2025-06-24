@@ -13,9 +13,9 @@ export const addLupon = async (req, res) => {
 
 // Get All
 export const getAllLupons = async (req, res) => {
-  try {
-    const hearings = await Lupon.find().sort({ scheduleOfHearing: 1 });
-    res.json(hearings);
+ try {
+    const lupons = await Lupon.find().populate('luponMembers');
+    res.json(lupons);
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -35,9 +35,17 @@ export const getLuponById = async (req, res) => {
 // Update
 export const updateLupon = async (req, res) => {
   try {
-    const updated = await Lupon.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
+    const updated = await Lupon.findByIdAndUpdate(
+      req.params.id,
+      {
+        ...req.body,
+        scheduleOfHearing: req.body.scheduleOfHearing,
+        status: req.body.status,
+        luponMembers: req.body.luponMembers, // Expecting array of IDs
+      },
+      { new: true }
+    ).populate('luponMembers'); // Populate members after update
+
     res.json(updated);
   } catch (err) {
     res.status(400).json({ error: err.message });
