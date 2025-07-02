@@ -5,6 +5,7 @@ import {
   getVehicleById,
   updateVehicle,
   deleteVehicle,
+  getVehicleStats,
 } from '../controllers/vehicle.controller.js'
 
 const router = express.Router();
@@ -14,5 +15,6 @@ router.get('/getVehicles', getAllVehicles);
 router.get('/getVehicle/:vehicleId', getVehicleById);
 router.put('/updateVehicle/:vehicleId', updateVehicle);
 router.delete('/deleteVehicle/:vehicleId', deleteVehicle);
+router.get("/getVehicleStats", getVehicleStats);
 
 export default router;

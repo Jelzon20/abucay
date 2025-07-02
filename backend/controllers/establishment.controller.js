@@ -64,3 +64,22 @@ export const deleteEstablishment = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+export const getEstablishmentStats = async (req, res) => {
+  try {
+    const stats = await Establishment.aggregate([
+      {
+        $group: {
+          _id: "$establishment_type",
+          count: { $sum: 1 },
+        },
+      },
+      {
+        $sort: { count: -1 }
+      }
+    ]);
+    res.status(200).json(stats);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};

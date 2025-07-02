@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Bar } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -11,6 +11,8 @@ import {
 } from "chart.js";
 import Calendar from "react-calendar";
 import ResidentChart from "../charts/ResidentChart";
+import VehicleChart from "../charts/VehicleChart";
+import EstablishmentChart from "../charts/EstablishmentChart";
 
 ChartJS.register(
   CategoryScale,
@@ -38,12 +40,12 @@ const DashboardTab = () => {
 
   // Quick Stats for Pending/Completed Requests
   const quickStats = [
-    { title: "Residents", count: 8, color: "bg-yellow-400" },
-    { title: "Registered Pedicabs", count: 25, color: "bg-green-400" },
-    { title: "Activities", count: 3, color: "bg-blue-400" },
-    { title: "Establishments", count: 8, color: "bg-yellow-400" },
-    { title: "Cases", count: 25, color: "bg-green-400" },
-    { title: "Blotter Records", count: 3, color: "bg-blue-400" },
+    // { title: "Residents", count: 8, color: "bg-yellow-400" },
+    // { title: "Registered Pedicabs", count: 25, color: "bg-green-400" },
+    // { title: "Activities", count: 3, color: "bg-blue-400" },
+    // { title: "Establishments", count: 8, color: "bg-yellow-400" },
+    // { title: "Cases", count: 25, color: "bg-green-400" },
+    // { title: "Blotter Records", count: 3, color: "bg-blue-400" },
   ];
 
   return (
@@ -54,13 +56,15 @@ const DashboardTab = () => {
         {/* Left Section */}
         <div className="bg-white p-6 rounded-lg shadow-md">
           <ResidentChart />
+          <VehicleChart />
         </div>
 
         {/* Right Section */}
         <div className="flex flex-col gap-6">
           {/* Quick Stats */}
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {quickStats.map((stat, index) => (
+          <div className="grid grid-cols-1 mb-12">
+            <EstablishmentChart />
+            {/* {quickStats.map((stat, index) => (
               <div
                 key={index}
                 className={`bg-white p-6 rounded-lg shadow-md flex flex-col items-center ${stat.color}`}
@@ -68,7 +72,7 @@ const DashboardTab = () => {
                 <h3 className="text-xl font-semibold mb-2">{stat.title}</h3>
                 <p className="text-3xl font-bold">{stat.count}</p>
               </div>
-            ))}
+            ))} */}
           </div>
         </div>
       </div>

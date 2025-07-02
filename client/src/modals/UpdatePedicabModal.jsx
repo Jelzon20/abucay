@@ -109,9 +109,9 @@ const UpdatePedicabModal = ({
                   className="block w-full text-sm border border-gray-300 rounded-lg text-gray-900 focus:outline-none focus:ring focus:ring-blue-300"
                 >
                   <option value="">Select Vehicle Type</option>
-                  <option value="Dismissed">Electric Bike</option>
-                  <option value="Resolved">Pedicab</option>
-                  <option value="Dismissed">Multicab</option>
+                  <option value="Electric Bike">Electric Bike</option>
+                  <option value="Pedicab">Pedicab</option>
+                  <option value="Multicab">Multicab</option>
                 </Select>
               </div>
 

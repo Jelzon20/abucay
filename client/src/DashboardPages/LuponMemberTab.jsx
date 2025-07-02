@@ -9,7 +9,7 @@ import {
 } from "@heroicons/react/24/outline";
 import AddLuponMemberModal from "../modals/AddLuponMemberModal";
 import UpdateLuponMemberModal from "../modals/UpdateLuponMemberModal";
-import DeleteLuponMemberModal from "../modals/deleteLuponMemberModal";
+import DeleteLuponMemberModal from "../modals/DeleteLuponMemberModal";
 
 const LuponMemberTab = () => {
   const [showAddModal, setShowAddModal] = useState(false);

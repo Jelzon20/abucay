@@ -47,3 +47,23 @@ export const deleteVehicle = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+export const getVehicleStats = async (req, res) => {
+  try {
+    const stats = await Vehicle.aggregate([
+      {
+        $group: {
+          _id: "$vehicle_type",
+          count: { $sum: 1 }
+        }
+      },
+      {
+        $sort: { count: -1 } // optional: sort by highest count
+      }
+    ]);
+
+    res.status(200).json(stats);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
