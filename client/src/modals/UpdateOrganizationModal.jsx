@@ -43,6 +43,8 @@ const UpdateOrganizationModal = ({
         organization: editData.organization || "",
         description: editData.description || "",
         president: editData.president || "",
+        contact_number: editData.contact_number || "",
+        address: editData.address || "",
       });
     }
   }, [editData]);
@@ -84,6 +86,8 @@ const UpdateOrganizationModal = ({
     }
   };
 
+  console.log(editData);
+
   return (
     <Dialog open={show} onClose={onClose} className="relative z-50">
       <div className="fixed inset-0 bg-black/30" />
@@ -113,6 +117,21 @@ const UpdateOrganizationModal = ({
                 className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
               />
             </div>
+            <div className="mb-4">
+              <label
+                htmlFor="president"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                President
+              </label>
+              <TextInput
+                id="president"
+                type="text"
+                value={form.president}
+                onChange={handleChange}
+                className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+              />
+            </div>
 
             <div className="mb-4">
               <label
@@ -129,18 +148,32 @@ const UpdateOrganizationModal = ({
                 className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
               />
             </div>
-
             <div className="mb-4">
               <label
-                htmlFor="president"
+                htmlFor="contact_number"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                President
+                Contact Number
               </label>
               <TextInput
-                id="president"
+                id="contact_number"
+                type="number"
+                value={form.contact_number}
+                onChange={handleChange}
+                className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+              />
+            </div>
+            <div className="mb-4">
+              <label
+                htmlFor="address"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Address
+              </label>
+              <TextInput
+                id="address"
                 type="text"
-                value={form.president}
+                value={form.address}
                 onChange={handleChange}
                 className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
               />

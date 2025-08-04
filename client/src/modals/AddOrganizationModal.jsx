@@ -10,6 +10,8 @@ const AddOrganizationModal = ({ show, onClose, onSubmit }) => {
     organization: "",
     description: "",
     president: "",
+    contact_number: "",
+    address: "",
   });
   const [isLoading, setIsLoading] = useState(false);
   const handleChange = (e) => {
@@ -37,6 +39,8 @@ const AddOrganizationModal = ({ show, onClose, onSubmit }) => {
           organization: "",
           description: "",
           president: "",
+          contact_number: "",
+          address: "",
         });
       } else {
         toast.error(data.error || "Something went wrong.");
@@ -76,6 +80,21 @@ const AddOrganizationModal = ({ show, onClose, onSubmit }) => {
                 className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
               />
             </div>
+            <div className="mb-4">
+              <label
+                htmlFor="president"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                President
+              </label>
+              <TextInput
+                id="president"
+                type="text"
+                value={form.president}
+                onChange={handleChange}
+                className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+              />
+            </div>
 
             <div className="mb-4">
               <label
@@ -92,18 +111,32 @@ const AddOrganizationModal = ({ show, onClose, onSubmit }) => {
                 className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
               />
             </div>
-
             <div className="mb-4">
               <label
-                htmlFor="president"
+                htmlFor="contact_number"
                 className="block text-sm font-medium text-gray-700 mb-2"
               >
-                President
+                Contact Number
               </label>
               <TextInput
-                id="president"
+                id="contact_number"
+                type="number"
+                value={form.contact_number}
+                onChange={handleChange}
+                className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+              />
+            </div>
+            <div className="mb-4">
+              <label
+                htmlFor="address"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Address
+              </label>
+              <TextInput
+                id="address"
                 type="text"
-                value={form.president}
+                value={form.address}
                 onChange={handleChange}
                 className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
               />

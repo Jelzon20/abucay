@@ -9,6 +9,7 @@ const AddBlotterModal = ({ show, onClose, onSubmit }) => {
     incident: "",
     description: "",
     takenBy: "",
+    actionTaken: "",
     date: null,
   });
   const [isLoading, setIsLoading] = useState(false);
@@ -21,6 +22,8 @@ const AddBlotterModal = ({ show, onClose, onSubmit }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
+
+    console.log(form);
     try {
       const res = await fetch("/api/blotters/addBlotter", {
         method: "POST",
@@ -38,6 +41,7 @@ const AddBlotterModal = ({ show, onClose, onSubmit }) => {
           description: "",
           takenBy: "",
           date: null,
+          actionTaken: "",
         });
       } else {
         toast.error(data.error || "Something went wrong.");
@@ -48,6 +52,7 @@ const AddBlotterModal = ({ show, onClose, onSubmit }) => {
       setIsLoading(false);
     }
   };
+
   return (
     <Dialog open={show} onClose={onClose} className="relative z-50">
       <div className="fixed inset-0 bg-black/30" />
@@ -110,6 +115,22 @@ const AddBlotterModal = ({ show, onClose, onSubmit }) => {
               />
             </div>
 
+            <div className="mb-4">
+              <label
+                htmlFor="actionTaken"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Action Taken
+              </label>
+              <TextInput
+                id="actionTaken"
+                type="text"
+                value={form.actionTaken}
+                onChange={handleChange}
+                className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+              />
+            </div>
+
             <div className="col-span-6 sm:col-span-2">
               <label
                 htmlFor="date"
@@ -119,7 +140,7 @@ const AddBlotterModal = ({ show, onClose, onSubmit }) => {
               </label>
               <TextInput
                 type="datetime-local"
-                id="scheduleOfHearing"
+                id="date"
                 value={form.date}
                 onChange={handleDateChange}
               />

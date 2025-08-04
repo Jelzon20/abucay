@@ -43,6 +43,7 @@ const UpdateBlotterModal = ({
         incident: editData.incident || "",
         description: editData.description || "",
         takenBy: editData.takenBy || "",
+        actionTaken: editData.actionTaken || "",
         date: formatDateForInput(editData.date),
       });
     }
@@ -84,6 +85,8 @@ const UpdateBlotterModal = ({
       setIsLoading(false);
     }
   };
+
+  console.log(editData);
 
   return (
     <Dialog open={show} onClose={onClose} className="relative z-50">
@@ -141,6 +144,22 @@ const UpdateBlotterModal = ({
                 id="takenBy"
                 type="text"
                 value={form.takenBy}
+                onChange={handleChange}
+                className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+              />
+            </div>
+
+            <div className="mb-4">
+              <label
+                htmlFor="actionTaken"
+                className="block text-sm font-medium text-gray-700 mb-2"
+              >
+                Action Taken
+              </label>
+              <TextInput
+                id="actionTaken"
+                type="text"
+                value={form.actionTaken}
                 onChange={handleChange}
                 className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
               />

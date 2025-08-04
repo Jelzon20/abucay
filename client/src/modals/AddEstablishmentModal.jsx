@@ -3,10 +3,11 @@ import { Dialog } from "@headlessui/react";
 import { TextInput, Button, Select } from "flowbite-react";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { toast, Toaster } from "sonner";
-// import { storage } from "../firebase"; // adjust path as needed
-// import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { storage } from "../firebase"; // adjust path as needed
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const AddEstablishmentModal = ({ show, onClose, onSubmit }) => {
+  const [attachments, setAttachments] = useState([]);
   const [form, setForm] = useState({
     establishment: "",
     description: "",
@@ -14,6 +15,7 @@ const AddEstablishmentModal = ({ show, onClose, onSubmit }) => {
     establishment_type: "",
     owner: "",
     dateEstablished: null,
+    numberOfEmployees: "",
   });
   const [isLoading, setIsLoading] = useState(false);
   const handleChange = (e) => {
@@ -26,10 +28,29 @@ const AddEstablishmentModal = ({ show, onClose, onSubmit }) => {
     e.preventDefault();
     setIsLoading(true);
     try {
+      // 1. Upload files to Firebase
+      const uploadedURLs = [];
+      for (const file of attachments) {
+        const fileRef = ref(
+          storage,
+          `establishments/${Date.now()}-${file.name}`
+        );
+        await uploadBytes(fileRef, file);
+        const downloadURL = await getDownloadURL(fileRef);
+        uploadedURLs.push(downloadURL);
+      }
+
+      // 2. Prepare form data with download URLs
+      const payload = {
+        ...form,
+        attachments: uploadedURLs,
+      };
+
+      // 3. Submit to your API
       const res = await fetch("/api/establishments/addEstablishment", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify(payload),
       });
 
       const data = await res.json();
@@ -44,7 +65,9 @@ const AddEstablishmentModal = ({ show, onClose, onSubmit }) => {
           description: "",
           owner: "",
           dateEstablished: null,
+          numberOfEmployees: "",
         });
+        setAttachments([]);
       } else {
         toast.error(data.error || "Something went wrong.");
       }
@@ -166,6 +189,64 @@ const AddEstablishmentModal = ({ show, onClose, onSubmit }) => {
                   onChange={handleDateChange}
                   required
                 />
+              </div>
+              <div className="mb-4">
+                <label
+                  htmlFor="employees"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Number of Employees
+                </label>
+                <TextInput
+                  id="numberOfEmployees"
+                  value={form.numberOfEmployees}
+                  type="number"
+                  onChange={handleChange}
+                  className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                />
+              </div>
+              <div className="mb-4">
+                <label
+                  htmlFor="attachments"
+                  className="block text-sm font-medium text-gray-700 mb-2"
+                >
+                  Upload Attachments
+                </label>
+                <input
+                  type="file"
+                  multiple
+                  id="attachments"
+                  onChange={(e) => {
+                    setAttachments((prev) => [
+                      ...prev,
+                      ...Array.from(e.target.files),
+                    ]);
+                  }}
+                  className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg cursor-pointer focus:outline-none focus:ring focus:ring-blue-300"
+                />
+                {attachments.length > 0 && (
+                  <ul className="mt-2 space-y-1 text-sm text-gray-600">
+                    {attachments.map((file, index) => (
+                      <li
+                        key={index}
+                        className="flex justify-between items-center"
+                      >
+                        <span>{file.name}</span>
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setAttachments((prev) =>
+                              prev.filter((_, i) => i !== index)
+                            );
+                          }}
+                          className="text-red-500 text-xs hover:underline"
+                        >
+                          Remove
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                )}
               </div>
             </div>
 

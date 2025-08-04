@@ -14,6 +14,10 @@ const blotterSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  actionTaken: {
+    type: String,
+    required: true,
+  },
   date: {
     type: Date,
     required: true,

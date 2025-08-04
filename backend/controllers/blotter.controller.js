@@ -22,11 +22,11 @@ export const getBlotterById = async (req, res) => {
 
 export const createBlotter = async (req, res) => {
   try {
-    const { incident, description, takenBy, date } = req.body;
-    const newBlotter = new Blotter({ incident, description, takenBy, date });
+    const { incident, description, takenBy, date, actionTaken } = req.body;
+    const newBlotter = new Blotter({ incident, description, takenBy, date, actionTaken });
     await newBlotter.save();
     res.status(201).json(newBlotter);
-  } catch (error) {
+  } catch (error) { 
     res.status(400).json({ error: error.message });
   }
 };

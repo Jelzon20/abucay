@@ -22,6 +22,14 @@ const establishmentSchema = new mongoose.Schema({
     type: Date,
     required: true,
   },
+  attachments: {
+    type: [String], // array of file names or URLs
+    default: [],
+  },
+  numberOfEmployees: {
+    type: Number,
+    default: 0,
+  }
 }, {
   timestamps: true
 });

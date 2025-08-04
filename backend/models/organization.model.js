@@ -13,6 +13,12 @@ const OrganizationSchema = new mongoose.Schema({
     type: String,
     default: "",
   },
+  contact_number: {
+    type: String
+  },
+  address: {
+    type: String
+  }
 }, {
   timestamps: true,
 });
