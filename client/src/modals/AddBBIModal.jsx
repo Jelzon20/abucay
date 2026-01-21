@@ -6,22 +6,27 @@ import { toast, Toaster } from "sonner";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from "../firebase";
 
-const AddOfficialModal = ({ show, onClose, onSubmit }) => {
+const AddBarangayInstitutionModal = ({ show, onClose, onSubmit }) => {
   const [form, setForm] = useState({
-    officialPicture: "",
-    name: "",
-    additionalDetails: "",
-    position: "",
-    contact_number: "",
-    term: "",
+    type: "",
+    typeOthers: "",
+    photo: "",
+    firstName: "",
+    lastName: "",
+    gender: "",
+    contactNumber: "",
+    address: "",
+    purokAssigned: "",
+    photo: "",
   });
   const [image, setImage] = useState(null);
-  const [isLoading, setIsLoading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [status, setStatus] = useState("");
   const [defaultImg, setDefaultImg] = useState(
     "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
   );
-  const [uploadProgress, setUploadProgress] = useState(0);
+  const [isLoading, setIsLoading] = useState(false);
+
   const handleFileChange = (e) => {
     if (e.target.files[0]) {
       setImage(e.target.files[0]);
@@ -48,20 +53,22 @@ const AddOfficialModal = ({ show, onClose, onSubmit }) => {
       () => {
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           setDefaultImg(downloadURL);
-          setForm((prev) => ({ ...prev, officialPicture: downloadURL }));
+          setForm((prev) => ({ ...prev, photo: downloadURL }));
           setStatus("Upload successful!");
         });
       }
     );
   };
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.id]: e.target.value });
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const res = await fetch("/api/officials/addOfficial", {
+      const res = await fetch("/api/bbi/createInstitution", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(form),
@@ -72,29 +79,25 @@ const AddOfficialModal = ({ show, onClose, onSubmit }) => {
       if (res.ok) {
         onClose();
         onSubmit();
-        resetForm();
+        setForm({
+          type: "",
+          typeOthers: "",
+          photo: "",
+          firstName: "",
+          lastName: "",
+          gender: "",
+          contactNumber: "",
+          address: "",
+          purokAssigned: "",
+          photo: "",
+        });
       } else {
         toast.error(data.error || "Something went wrong.");
       }
     } catch (error) {
-      toast.error("Error saving record: " + error.message);
+      toast.error("Error saving a record: " + error.message);
     }
     setIsLoading(false);
-  };
-
-  const resetForm = (e) => {
-    setForm({
-      officialPicture: "",
-      name: "",
-      additionalDetails: "",
-      position: "",
-      contactNumber: "",
-      term: "",
-    });
-    setDefaultImg(
-      "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
-    );
-    setStatus("");
   };
 
   return (
@@ -105,12 +108,13 @@ const AddOfficialModal = ({ show, onClose, onSubmit }) => {
         <LoadingSpinner />
       ) : (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <Dialog.Panel className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+          <Dialog.Panel className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl max-h-[90vh] overflow-y-auto">
             <Dialog.Title className="text-lg font-semibold mb-4">
-              Add Barangay Official
+              Add a new record
             </Dialog.Title>
 
             <div className="mb-4">
+              {/* Left Column - Photo */}
               <div className="col-span-1 flex flex-col items-center">
                 <div className="w-40 h-40 rounded-full bg-gray-200 overflow-hidden mb-4">
                   <img
@@ -124,9 +128,9 @@ const AddOfficialModal = ({ show, onClose, onSubmit }) => {
                   accept="image/*"
                   onChange={handleFileChange}
                   className="hidden"
-                  id="upload-photo"
+                  id="photo"
                 />
-                <label htmlFor="upload-photo">
+                <label htmlFor="photo">
                   <Button size="sm" color="gray" as="span">
                     Change Photo
                   </Button>
@@ -140,96 +144,109 @@ const AddOfficialModal = ({ show, onClose, onSubmit }) => {
                   <p className="text-sm mt-1 text-gray-600">{status}</p>
                 )}
               </div>
-              <label
-                htmlFor="incident"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Complete Name
-              </label>
-              <TextInput
-                id="name"
-                type="text"
-                value={form.name}
-                onChange={handleChange}
-                placeholder="Enter incident title"
-                className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
-              />
             </div>
 
+            {/* Type */}
             <div className="mb-4">
-              <label
-                htmlFor="description"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Additional Details
-              </label>
-              <TextInput
-                id="additionalDetails"
-                type="text"
-                value={form.additionalDetails}
-                onChange={handleChange}
-                className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
-              />
-            </div>
-
-            <div className="mb-4">
-              <label
-                htmlFor="position"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Position
-              </label>
+              <Label htmlFor="location">Type of Institution</Label>
               <Select
-                id="position"
-                value={form.position}
+                id="type"
+                value={form.type}
                 onChange={handleChange}
                 required
               >
                 <option value="">Select here</option>
-                <option value="Punong Barangay">Punong Barangay</option>
-                <option value="Sangguniang Barangay Member">
-                  Sangguniang Barangay Member
+                <option value="Brgy. Health Worker">Brgy. Health Worker</option>
+                <option value="Brgy. Nutrition Scholar">
+                  Brgy. Nutrition Scholar
                 </option>
-                <option value="SK Chairperson">SK Chairperson</option>
-                <option value="Barangay Secretary">Barangay Secretary</option>
-                <option value="SK Member">SK Member</option>
-                <option value="SK Secretary">SK Secretary</option>
+                <option value="Brgy. Service Point Officer">
+                  Brgy. Service Point Officer
+                </option>
+                <option value="Brgy. Tanod">Brgy. Tanod</option>
+                <option value="Brgy. Aide">Brgy. Aide</option>
+                <option value="Others">Others</option>
               </Select>
+
+              {/* Show text input if 'Others' is selected */}
+              {form.type === "Others" && (
+                <div className="mt-2">
+                  <Label htmlFor="otherType">Please specify</Label>
+                  <TextInput
+                    id="typeOthers"
+                    value={form.typeOthers || ""}
+                    onChange={handleChange}
+                    placeholder="Enter institution type"
+                  />
+                </div>
+              )}
             </div>
 
             <div className="mb-4">
-              <label
-                htmlFor="contactNumber"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Contact Number
-              </label>
+              <Label>First name</Label>
+              <TextInput
+                id="firstName"
+                type="text"
+                value={form.firstName}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="mb-4">
+              <Label>Last name</Label>
+              <TextInput
+                id="lastName"
+                type="text"
+                value={form.lastName}
+                onChange={handleChange}
+              />
+            </div>
+
+            <div className="mb-4">
+              <Label>Gender</Label>
+              <Select id="gender" value={form.gender} onChange={handleChange}>
+                <option value="">Select here</option>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+              </Select>
+            </div>
+            <div className="mb-4">
+              <Label>Contact Number</Label>
               <TextInput
                 id="contactNumber"
-                type="text"
+                type="number"
                 value={form.contactNumber}
                 onChange={handleChange}
-                className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
               />
             </div>
             <div className="mb-4">
-              <label
-                htmlFor="takenBy"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
-                Term
-              </label>
+              <Label>Address</Label>
+              <TextInput
+                id="address"
+                type="text"
+                value={form.address}
+                onChange={handleChange}
+              />
+            </div>
+            <div className="mb-4">
+              <Label>Purok</Label>
               <Select
-                id="term"
-                value={form.term}
+                id="purokAssigned"
+                value={form.purokAssigned}
                 onChange={handleChange}
                 required
               >
                 <option value="">Select here</option>
-                <option value="2023 - 2025">2023 - 2025</option>
+                <option value="Purok 1">Purok 1</option>
+                <option value="Purok 1">Purok 2</option>
+                <option value="Purok 3">Purok 3</option>
+                <option value="Purok 4">Purok 4</option>
+                <option value="Purok 5">Purok 5</option>
+                <option value="Purok 6">Purok 6</option>
+                <option value="Purok 7">Purok 7</option>
               </Select>
             </div>
 
+            {/* Buttons */}
             <div className="mt-6 flex justify-end gap-2">
               <Button onClick={handleSubmit}>Submit</Button>
               <Button color="gray" onClick={onClose}>
@@ -243,4 +260,4 @@ const AddOfficialModal = ({ show, onClose, onSubmit }) => {
   );
 };
 
-export default AddOfficialModal;
+export default AddBarangayInstitutionModal;

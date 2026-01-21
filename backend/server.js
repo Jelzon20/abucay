@@ -13,6 +13,10 @@ import activityRoutes from './routes/activity.routes.js';
 import officialRoutes from './routes/officials.routes.js';
 import certRoutes from './routes/certificates.route.js';
 import brgyDisputeRoutes from './routes/brgyDispute.route.js';
+import barangayInstitutionRoutes from "./routes/bbi.route.js";
+import authRoutes from "./routes/auth.route.js";
+import contactRoutes from "./routes/contact.routes.js";
+
 
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -39,6 +43,11 @@ app.use("/api/activities", activityRoutes);
 app.use("/api/officials", officialRoutes);
 app.use("/api/certs", certRoutes);
 app.use('/api/brgyDisputes', brgyDisputeRoutes);
+app.use('/api/bbi', barangayInstitutionRoutes);
+app.use('/api/auth', authRoutes);
+app.use('/api/contact', contactRoutes);
+
+
 
 // Serve frontend static files
 app.use(express.static(path.join(__dirname, '../client/dist')));

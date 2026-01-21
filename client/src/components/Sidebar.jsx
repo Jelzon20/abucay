@@ -13,6 +13,7 @@ import {
   Cog6ToothIcon,
   ChevronDownIcon,
   ChevronUpIcon,
+  MegaphoneIcon,
 } from "@heroicons/react/24/outline";
 
 const Sidebar = () => {
@@ -32,6 +33,11 @@ const Sidebar = () => {
     {
       name: "Barangay Officials",
       path: "/dashboard/officials",
+      icon: <UserIcon className="h-5 w-5 mr-2" />,
+    },
+    {
+      name: "Barangay-based Institutions",
+      path: "/dashboard/barangayInstitutions",
       icon: <UserIcon className="h-5 w-5 mr-2" />,
     },
     {
@@ -85,18 +91,19 @@ const Sidebar = () => {
       icon: <CalendarDateRangeIcon className="h-5 w-5 mr-2" />,
     },
     {
+      name: "Contact Requests",
+      path: "/dashboard/contactRequests",
+      icon: <MegaphoneIcon className="h-5 w-5 mr-2" />,
+    },
+    {
       name: "Services",
       path: "/dashboard/services",
       icon: <Cog6ToothIcon className="h-5 w-5 mr-2" />,
       hasDropdown: true,
       children: [
         {
-          name: "Barangay Certificate",
-          path: "/dashboard/services/barangay-certificate",
-        },
-        {
-          name: "Clearance",
-          path: "/dashboard/services/barangay-clearance",
+          name: "Request New",
+          path: "/dashboard/services/request-new",
         },
       ],
     },

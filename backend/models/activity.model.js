@@ -12,6 +12,7 @@ const ActivitySchema = new mongoose.Schema({
   },
   location: String,
   organizer: String,
+  photos: [String],
 }, {
   timestamps: true,
 });

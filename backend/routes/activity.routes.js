@@ -5,6 +5,7 @@ import {
   getActivityById,
   updateActivity,
   deleteActivity,
+  getAllActivityImages
 } from "../controllers/activity.controller.js";
 
 const router = express.Router();
@@ -14,5 +15,6 @@ router.get("/getActivities", getActivities);
 router.get("/getActivity/:id", getActivityById);
 router.put("/updateActivity/:id", updateActivity);
 router.delete("/deleteActivity/:id", deleteActivity);
+router.get("/getAllActivityImages", getAllActivityImages);
 
 export default router;

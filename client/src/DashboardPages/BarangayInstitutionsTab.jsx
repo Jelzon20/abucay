@@ -1,21 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { Modal, Button, TextInput } from "flowbite-react";
-import { toast, Toaster } from "sonner";
-import LoadingSpinner from "../components/LoadingSpinner";
+import React, { useState, useEffect } from "react";
 import {
-  ArrowDownTrayIcon,
   PencilIcon,
   TrashIcon,
+  ArrowDownTrayIcon,
 } from "@heroicons/react/24/outline";
-import AddActivityModal from "../modals/AddActivityModal";
-import UpdateActivityModal from "../modals/UpdateActivityModal";
-import DeleteActivityModal from "../modals/DeleteActivityModal";
-import AddOfficialModal from "../modals/AddOfficialModal";
-import UpdateOfficialsModal from "../modals/UpdateOfficialsModal";
+import { Modal, Button, TextInput } from "flowbite-react";
+import { toast, Toaster } from "sonner";
 
-const BarangayOfficialsTab = () => {
+import LoadingSpinner from "../components/LoadingSpinner";
+import AddBarangayInstitutionModal from "../modals/AddBBIModal";
+import UpdateBarangayInstitutionModal from "../modals/UpdateBBIModal";
+import DeleteBBIModal from "../modals/DeleteBBIModal";
+
+const BarangayInstitutionsTab = () => {
   const [showAddModal, setShowAddModal] = useState(false);
-  const [officials, setOfficials] = useState([]);
+  const [bbis, setBBIs] = useState([]);
   const [sortField, setSortField] = useState("name");
   const [isLoading, setIsLoading] = useState(false);
 
@@ -28,37 +27,34 @@ const BarangayOfficialsTab = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false); // boolean
   const [deleteData, setDeleteData] = useState(null); // data to edit
 
-  const columns = [
-    { label: "Official Picture", key: "officialPicture" },
-    { label: "Name", key: "name" },
-    { label: "Position", key: "position" },
-    { label: "Additional Details", key: "Additional Details" },
-    { label: "Contact Number", key: "contactNumber" },
-    { label: "Term", key: "term" },
-  ];
-
-  const fetchOfficials = async () => {
+  const fetchBBIs = async () => {
     setIsLoading(true);
-    const res = await fetch("/api/officials/getOfficials");
+    const res = await fetch("/api/bbi/getInstitutions");
     const data = await res.json();
-    setOfficials(data);
+    setBBIs(data);
     setIsLoading(false);
   };
 
   useEffect(() => {
-    fetchOfficials();
+    fetchBBIs();
   }, []);
 
-  const filtered = officials.filter((official) => {
-    const fullText = `
-      ${official.officialPicture}
-      ${official.name}
-      ${official.additionalDetails}
-      ${official.position}
-       ${official.contactNumber}
-        ${official.term}
+  const columns = [
+    { label: "Photo", key: "photo" },
+    { label: "Type", key: "type" },
+    { label: "First Name", key: "firstName" },
+    { label: "Last Name", key: "lastName" },
+    { label: "Contact Number", key: "contactNumber" },
+    { label: "Address", key: "address" },
+    { label: "Purok Assigned", key: "purokAssigned" },
+  ];
 
-    `
+  const filtered = bbis.filter((bbi) => {
+    const fullText = `
+        ${bbi.photo}
+        ${bbi.type}
+        ${bbi.firstName}
+      `
       .toLowerCase()
       .replace(/\s+/g, " ");
 
@@ -115,7 +111,7 @@ const BarangayOfficialsTab = () => {
     )}`;
     const timePart = `${pad(now.getHours())}-${pad(now.getMinutes())}`;
 
-    const filename = `officials-${datePart} ${timePart}.csv`;
+    const filename = `barangay-based-institutions-${datePart} ${timePart}.csv`;
 
     const link = document.createElement("a");
     link.setAttribute("href", url);
@@ -124,6 +120,7 @@ const BarangayOfficialsTab = () => {
     link.click();
     document.body.removeChild(link);
   };
+
   const handleDelete = (act) => {
     setDeleteData(act);
     setDeleteModalOpen(true);
@@ -133,29 +130,6 @@ const BarangayOfficialsTab = () => {
     setEditData(act);
     setEditModalOpen(true);
   };
-  //   const formatDateForInput = (dateString) => {
-  //     if (!dateString) return "";
-
-  //     const date = new Date(dateString);
-  //     if (isNaN(date.getTime())) {
-  //       console.error("Invalid date string:", dateString);
-  //       return "";
-  //     }
-
-  //     const pad = (n) => n.toString().padStart(2, "0");
-
-  //     const year = date.getFullYear();
-  //     const month = pad(date.getMonth() + 1);
-  //     const day = pad(date.getDate());
-
-  //     let hours = date.getHours();
-  //     const minutes = pad(date.getMinutes());
-  //     const ampm = hours >= 12 ? "PM" : "AM";
-  //     hours = hours % 12;
-  //     hours = hours ? hours : 12; // 0 should be 12
-
-  //     return `${year}-${month}-${day} ${hours}:${minutes} ${ampm}`;
-  //   };
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6">
@@ -165,7 +139,7 @@ const BarangayOfficialsTab = () => {
         <div className="flex flex-col md:flex-row justify-between gap-4 items-start md:items-center">
           <Button onClick={() => setShowAddModal(true)}>
             {" "}
-            + Add Barangay Official
+            + Add a new record
           </Button>
           <div className="flex flex-wrap gap-3">
             <input
@@ -213,33 +187,34 @@ const BarangayOfficialsTab = () => {
                 </tr>
               </thead>
               <tbody>
-                {paginated.map((official) => (
+                {paginated.map((bbi) => (
                   <tr
-                    key={official._id}
+                    key={bbi._id}
                     className="border-t hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                   >
                     <td className="px-6 py-3">
                       <img
                         className="w-10 h-10 rounded-full"
-                        src={official.officialPicture}
-                        alt={official.officialPicture}
+                        key={bbi._id}
+                        src={bbi.photo || null}
+                        alt={"BBI photo"}
                       />
                     </td>
-
-                    <td className="px-6 py-3">{official.name}</td>
-                    <td className="px-6 py-3">{official.position}</td>
-                    <td className="px-6 py-3">{official.additionalDetails}</td>
-                    <td className="px-6 py-3">{official.contactNumber}</td>
-                    <td className="px-6 py-3">{official.term}</td>
+                    <td className="px-6 py-3">{bbi.type}</td>
+                    <td className="px-6 py-3">{bbi.firstName}</td>
+                    <td className="px-6 py-3">{bbi.lastName}</td>
+                    <td className="px-6 py-3">{bbi.contactNumber}</td>
+                    <td className="px-6 py-3">{bbi.address}</td>
+                    <td className="px-6 py-3">{bbi.purokAssigned}</td>
                     <td className="px-6 py-3 flex gap-2">
                       <button
-                        onClick={() => handleUpdate(official)}
+                        onClick={() => handleUpdate(bbi)}
                         className="text-blue-600 hover:text-blue-800 dark:text-blue-300 dark:hover:text-blue-500"
                       >
                         <PencilIcon className="h-5 w-5" />
                       </button>
                       <button
-                        onClick={() => handleDelete(official)}
+                        onClick={() => handleDelete(bbi)}
                         className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-500"
                       >
                         <TrashIcon className="h-5 w-5" />
@@ -252,39 +227,39 @@ const BarangayOfficialsTab = () => {
           </div>
         )}
         {showAddModal && (
-          <AddOfficialModal
+          <AddBarangayInstitutionModal
             show={showAddModal}
             onClose={() => setShowAddModal(false)}
             onSubmit={() => {
-              toast.success("New record saved!");
-              fetchOfficials();
+              toast.success("New activity saved!");
+              fetchBBIs();
               setShowAddModal(false);
             }}
           />
         )}
         {/* Update Document Modal */}
         {editModalOpen && editData && (
-          <UpdateOfficialsModal
+          <UpdateBarangayInstitutionModal
             show={editModalOpen}
             onClose={() => setEditModalOpen(false)}
             editData={editData}
             setEditData={setEditData}
             onSubmit={() => {
               toast.success("Record has been updated.");
-              fetchOfficials();
+              fetchBBIs();
               setEditModalOpen(false);
             }}
           />
         )}
         {deleteModalOpen && (
-          <DeleteActivityModal
+          <DeleteBBIModal
             show={deleteModalOpen}
             onClose={() => setDeleteModalOpen(false)}
             deleteData={deleteData}
             setDeleteData={setDeleteData}
             onConfirm={() => {
               toast.success("Record has been deleted.");
-              fetchActivities();
+              fetchBBIs();
               setDeleteModalOpen(false);
             }}
           />
@@ -294,4 +269,4 @@ const BarangayOfficialsTab = () => {
   );
 };
 
-export default BarangayOfficialsTab;
+export default BarangayInstitutionsTab;

@@ -1,33 +1,48 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog } from "@headlessui/react";
-import { TextInput, Button, Label, Textarea, Select } from "flowbite-react";
+import { TextInput, Button, Label, Select } from "flowbite-react";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { toast, Toaster } from "sonner";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { storage } from "../firebase";
 
-const AddOfficialModal = ({ show, onClose, onSubmit }) => {
-  const [form, setForm] = useState({
-    officialPicture: "",
-    name: "",
-    additionalDetails: "",
-    position: "",
-    contact_number: "",
-    term: "",
-  });
-  const [image, setImage] = useState(null);
+const UpdateOfficialsModal = ({
+  show,
+  onClose,
+  editData,
+  setEditData,
+  onSubmit,
+}) => {
+  const [form, setForm] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+
+  const [image, setImage] = useState(null);
+  const [uploadProgress, setUploadProgress] = useState(0);
   const [status, setStatus] = useState("");
   const [defaultImg, setDefaultImg] = useState(
     "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
   );
-  const [uploadProgress, setUploadProgress] = useState(0);
+
+  useEffect(() => {
+    if (editData) {
+      setForm({
+        officialPicture: editData.officialPicture || "",
+        name: editData.name || "",
+        position: editData.position || "",
+        additionalDetails: editData.additionalDetails || "",
+        contactNumber: editData.contactNumber || "",
+        term: editData.term || [],
+      });
+    }
+  }, [editData]);
+
   const handleFileChange = (e) => {
     if (e.target.files[0]) {
       setImage(e.target.files[0]);
       uploadImage(e.target.files[0]);
     }
   };
+
   const uploadImage = (file) => {
     const storageRef = ref(storage, `images/${file.name}`);
     const uploadTask = uploadBytesResumable(storageRef, file);
@@ -54,47 +69,47 @@ const AddOfficialModal = ({ show, onClose, onSubmit }) => {
       }
     );
   };
+
   const handleChange = (e) => {
     setForm({ ...form, [e.target.id]: e.target.value });
   };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsLoading(true);
     try {
-      const res = await fetch("/api/officials/addOfficial", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
+      const response = await fetch(
+        `/api/officials/updateOfficial/${editData._id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(form),
+        }
+      );
 
-      const data = await res.json();
-
-      if (res.ok) {
-        onClose();
-        onSubmit();
-        resetForm();
-      } else {
-        toast.error(data.error || "Something went wrong.");
+      if (!response.ok) {
+        throw new Error("Failed to update barangay official record.");
       }
-    } catch (error) {
-      toast.error("Error saving record: " + error.message);
-    }
-    setIsLoading(false);
-  };
 
-  const resetForm = (e) => {
-    setForm({
-      officialPicture: "",
-      name: "",
-      additionalDetails: "",
-      position: "",
-      contactNumber: "",
-      term: "",
-    });
-    setDefaultImg(
-      "https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_960_720.png"
-    );
-    setStatus("");
+      await response.json();
+      onSubmit();
+      setForm({
+        officialPicture: "",
+        name: "",
+        position: "",
+        additionalDetails: "",
+        contactNumber: "",
+        term: "",
+      });
+    } catch (error) {
+      toast.error("Error updating barangay official record");
+      console.error("Update error:", error);
+    } finally {
+      setIsLoading(false);
+      onClose();
+    }
   };
 
   return (
@@ -105,16 +120,16 @@ const AddOfficialModal = ({ show, onClose, onSubmit }) => {
         <LoadingSpinner />
       ) : (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <Dialog.Panel className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl">
+          <Dialog.Panel className="w-full max-w-md rounded-lg bg-white p-6 shadow-xl overflow-y-auto max-h-[90vh]">
             <Dialog.Title className="text-lg font-semibold mb-4">
-              Add Barangay Official
+              Update Barangay Official Record
             </Dialog.Title>
 
             <div className="mb-4">
               <div className="col-span-1 flex flex-col items-center">
                 <div className="w-40 h-40 rounded-full bg-gray-200 overflow-hidden mb-4">
                   <img
-                    src={defaultImg}
+                    src={form.officialPicture || defaultImg}
                     alt="Profile"
                     className="w-full h-full object-cover"
                   />
@@ -190,10 +205,16 @@ const AddOfficialModal = ({ show, onClose, onSubmit }) => {
                 <option value="Sangguniang Barangay Member">
                   Sangguniang Barangay Member
                 </option>
-                <option value="SK Chairperson">SK Chairperson</option>
-                <option value="Barangay Secretary">Barangay Secretary</option>
-                <option value="SK Member">SK Member</option>
-                <option value="SK Secretary">SK Secretary</option>
+                <option value="Sangguniang Barangay Member">
+                  SK Chairperson
+                </option>
+                <option value="Sangguniang Barangay Member">
+                  Barangay Secretary
+                </option>
+                <option value="Sangguniang Barangay Member">SK Member</option>
+                <option value="Sangguniang Barangay Member">
+                  SK Secretary
+                </option>
               </Select>
             </div>
 
@@ -230,6 +251,7 @@ const AddOfficialModal = ({ show, onClose, onSubmit }) => {
               </Select>
             </div>
 
+            {/* Buttons */}
             <div className="mt-6 flex justify-end gap-2">
               <Button onClick={handleSubmit}>Submit</Button>
               <Button color="gray" onClick={onClose}>
@@ -243,4 +265,4 @@ const AddOfficialModal = ({ show, onClose, onSubmit }) => {
   );
 };
 
-export default AddOfficialModal;
+export default UpdateOfficialsModal;

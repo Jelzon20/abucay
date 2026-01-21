@@ -7,12 +7,6 @@ import {
   PencilIcon,
   TrashIcon,
 } from "@heroicons/react/24/outline";
-import AddBlotterModal from "../modals/AddBlotterModal";
-import UpdateBlotterModal from "../modals/UpdateBlotterModal";
-import DeleteBlotterModal from "../modals/DeleteBlotterModal";
-import AddOrganizationModal from "../modals/AddOrganizationModal";
-import UpdateOrganizationModal from "../modals/UpdateOrganizationModal";
-import DeleteOrganizationModal from "../modals/DeleteOrganizationModal";
 import AddActivityModal from "../modals/AddActivityModal";
 import UpdateActivityModal from "../modals/UpdateActivityModal";
 import DeleteActivityModal from "../modals/DeleteActivityModal";

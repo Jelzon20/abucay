@@ -1,24 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { Modal, Button, TextInput } from "flowbite-react";
-import { toast, Toaster } from "sonner";
-import LoadingSpinner from "../components/LoadingSpinner";
+import React, { useState, useEffect } from "react";
 import {
-  ArrowDownTrayIcon,
   PencilIcon,
   TrashIcon,
+  ArrowDownTrayIcon,
 } from "@heroicons/react/24/outline";
-import AddActivityModal from "../modals/AddActivityModal";
-import UpdateActivityModal from "../modals/UpdateActivityModal";
-import DeleteActivityModal from "../modals/DeleteActivityModal";
-import AddOfficialModal from "../modals/AddOfficialModal";
-import UpdateOfficialsModal from "../modals/UpdateOfficialsModal";
+import { Modal, Button, TextInput } from "flowbite-react";
+import { toast, Toaster } from "sonner";
 
-const BarangayOfficialsTab = () => {
-  const [showAddModal, setShowAddModal] = useState(false);
-  const [officials, setOfficials] = useState([]);
+import LoadingSpinner from "../components/LoadingSpinner";
+import UpdateContactRequestModal from "../modals/UpdateContactRequestModal";
+
+const ContactRequestsTab = () => {
+  const [contactRequests, setContactRequests] = useState([]);
   const [sortField, setSortField] = useState("name");
   const [isLoading, setIsLoading] = useState(false);
-
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(10); // or any default value
@@ -28,37 +23,37 @@ const BarangayOfficialsTab = () => {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false); // boolean
   const [deleteData, setDeleteData] = useState(null); // data to edit
 
-  const columns = [
-    { label: "Official Picture", key: "officialPicture" },
-    { label: "Name", key: "name" },
-    { label: "Position", key: "position" },
-    { label: "Additional Details", key: "Additional Details" },
-    { label: "Contact Number", key: "contactNumber" },
-    { label: "Term", key: "term" },
-  ];
-
-  const fetchOfficials = async () => {
+  const fetchContactRequests = async () => {
     setIsLoading(true);
-    const res = await fetch("/api/officials/getOfficials");
+    const res = await fetch("/api/contact/getReports");
     const data = await res.json();
-    setOfficials(data);
+    setContactRequests(data);
     setIsLoading(false);
   };
 
   useEffect(() => {
-    fetchOfficials();
+    fetchContactRequests();
   }, []);
 
-  const filtered = officials.filter((official) => {
-    const fullText = `
-      ${official.officialPicture}
-      ${official.name}
-      ${official.additionalDetails}
-      ${official.position}
-       ${official.contactNumber}
-        ${official.term}
+  const columns = [
+    { label: "Name", key: "name" },
+    { label: "Email", key: "email" },
+    { label: "Phone", key: "phone" },
+    { label: "Issue Type", key: "issueType" },
+    { label: "Address", key: "address" },
+    { label: "Preferred Contact", key: "preferredContact" },
+    { label: "State", key: "state" },
+  ];
 
-    `
+  const filtered = contactRequests.filter((contactRequest) => {
+    const fullText = `
+        ${contactRequest.name}
+        ${contactRequest.issueType}
+        ${contactRequest.email}
+        ${contactRequest.phone}
+        ${contactRequest.address}
+        ${contactRequest.preferredContact}
+      `
       .toLowerCase()
       .replace(/\s+/g, " ");
 
@@ -115,7 +110,7 @@ const BarangayOfficialsTab = () => {
     )}`;
     const timePart = `${pad(now.getHours())}-${pad(now.getMinutes())}`;
 
-    const filename = `officials-${datePart} ${timePart}.csv`;
+    const filename = `Contact Requests-${datePart} ${timePart}.csv`;
 
     const link = document.createElement("a");
     link.setAttribute("href", url);
@@ -124,6 +119,7 @@ const BarangayOfficialsTab = () => {
     link.click();
     document.body.removeChild(link);
   };
+
   const handleDelete = (act) => {
     setDeleteData(act);
     setDeleteModalOpen(true);
@@ -133,29 +129,6 @@ const BarangayOfficialsTab = () => {
     setEditData(act);
     setEditModalOpen(true);
   };
-  //   const formatDateForInput = (dateString) => {
-  //     if (!dateString) return "";
-
-  //     const date = new Date(dateString);
-  //     if (isNaN(date.getTime())) {
-  //       console.error("Invalid date string:", dateString);
-  //       return "";
-  //     }
-
-  //     const pad = (n) => n.toString().padStart(2, "0");
-
-  //     const year = date.getFullYear();
-  //     const month = pad(date.getMonth() + 1);
-  //     const day = pad(date.getDate());
-
-  //     let hours = date.getHours();
-  //     const minutes = pad(date.getMinutes());
-  //     const ampm = hours >= 12 ? "PM" : "AM";
-  //     hours = hours % 12;
-  //     hours = hours ? hours : 12; // 0 should be 12
-
-  //     return `${year}-${month}-${day} ${hours}:${minutes} ${ampm}`;
-  //   };
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6">
@@ -163,10 +136,10 @@ const BarangayOfficialsTab = () => {
 
       <div className="max-w-full mx-auto bg-white dark:bg-gray-800 rounded-xl shadow-md p-6 space-y-6">
         <div className="flex flex-col md:flex-row justify-between gap-4 items-start md:items-center">
-          <Button onClick={() => setShowAddModal(true)}>
+          {/* <Button onClick={() => setShowAddModal(true)}>
             {" "}
-            + Add Barangay Official
-          </Button>
+            + Add a new record
+          </Button> */}
           <div className="flex flex-wrap gap-3">
             <input
               type="text"
@@ -213,33 +186,29 @@ const BarangayOfficialsTab = () => {
                 </tr>
               </thead>
               <tbody>
-                {paginated.map((official) => (
+                {paginated.map((contactRequest) => (
                   <tr
-                    key={official._id}
+                    key={contactRequest._id}
                     className="border-t hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                   >
+                    <td className="px-6 py-3">{contactRequest.name}</td>
+                    <td className="px-6 py-3">{contactRequest.email}</td>
+                    <td className="px-6 py-3">{contactRequest.phone}</td>
+                    <td className="px-6 py-3">{contactRequest.issueType}</td>
+                    <td className="px-6 py-3">{contactRequest.address}</td>
                     <td className="px-6 py-3">
-                      <img
-                        className="w-10 h-10 rounded-full"
-                        src={official.officialPicture}
-                        alt={official.officialPicture}
-                      />
+                      {contactRequest.preferredContact}
                     </td>
-
-                    <td className="px-6 py-3">{official.name}</td>
-                    <td className="px-6 py-3">{official.position}</td>
-                    <td className="px-6 py-3">{official.additionalDetails}</td>
-                    <td className="px-6 py-3">{official.contactNumber}</td>
-                    <td className="px-6 py-3">{official.term}</td>
+                    <td className="px-6 py-3">{contactRequest.state}</td>
                     <td className="px-6 py-3 flex gap-2">
                       <button
-                        onClick={() => handleUpdate(official)}
+                        onClick={() => handleUpdate(contactRequest)}
                         className="text-blue-600 hover:text-blue-800 dark:text-blue-300 dark:hover:text-blue-500"
                       >
                         <PencilIcon className="h-5 w-5" />
                       </button>
                       <button
-                        onClick={() => handleDelete(official)}
+                        onClick={() => handleDelete(contactRequest)}
                         className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-500"
                       >
                         <TrashIcon className="h-5 w-5" />
@@ -251,47 +220,36 @@ const BarangayOfficialsTab = () => {
             </table>
           </div>
         )}
-        {showAddModal && (
-          <AddOfficialModal
-            show={showAddModal}
-            onClose={() => setShowAddModal(false)}
-            onSubmit={() => {
-              toast.success("New record saved!");
-              fetchOfficials();
-              setShowAddModal(false);
-            }}
-          />
-        )}
         {/* Update Document Modal */}
         {editModalOpen && editData && (
-          <UpdateOfficialsModal
+          <UpdateContactRequestModal
             show={editModalOpen}
             onClose={() => setEditModalOpen(false)}
             editData={editData}
             setEditData={setEditData}
             onSubmit={() => {
               toast.success("Record has been updated.");
-              fetchOfficials();
+              fetchContactRequests();
               setEditModalOpen(false);
             }}
           />
         )}
-        {deleteModalOpen && (
-          <DeleteActivityModal
+        {/* {deleteModalOpen && (
+          <DeleteBBIModal
             show={deleteModalOpen}
             onClose={() => setDeleteModalOpen(false)}
             deleteData={deleteData}
             setDeleteData={setDeleteData}
             onConfirm={() => {
               toast.success("Record has been deleted.");
-              fetchActivities();
+              fetchBBIs();
               setDeleteModalOpen(false);
             }}
           />
-        )}
+        )} */}
       </div>
     </div>
   );
 };
 
-export default BarangayOfficialsTab;
+export default ContactRequestsTab;

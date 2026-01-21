@@ -57,3 +57,15 @@ export const deleteActivity = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const getAllActivityImages = async (req, res) => {
+  try {
+    const activities = await Activity.find();
+    // Flatten all images from all records
+    const allImages = activities.flatMap(activity => activity.photos);
+    res.json(allImages);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+

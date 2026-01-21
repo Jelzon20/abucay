@@ -110,8 +110,14 @@ const AddCertModal = ({ show, onClose, onSubmit }) => {
                 required
               >
                 <option value="">Select here</option>
-                <option value="Barangay Certificate">
-                  Barangay Certificate
+                <option value="CERTIFICATE OF INDIGENCY">
+                  CERTIFICATE OF INDIGENCY
+                </option>
+                <option value="BARANGAY CERTIFICATION (Senior Citizen)">
+                  BARANGAY CERTIFICATION (Senior Citizen)
+                </option>
+                <option value="BARANGAY CERTIFICATION (FIRST TIME JOB SEEKERS ACT –RA 11261)">
+                  BARANGAY CERTIFICATION (FIRST TIME JOB SEEKERS ACT –RA 11261)
                 </option>
               </Select>
             </div>

@@ -17,28 +17,51 @@ import OrganizationTab from "./DashboardPages/OrganizationTab";
 import ActivityTab from "./DashboardPages/ActivityTab";
 import BrgyCertTab from "./DashboardPages/BrgyCertTab";
 import ServicesTab from "./DashboardPages/ServicesTab";
-import ClearanceTab from "./DashboardPages/ClearanceTab";
 import BarangayOfficialsTab from "./DashboardPages/BarangayOfficialsTab";
-import OrgChart from "./pages/OrgChart";
 import ServicesPage from "./pages/ServicesPage";
 import Footer from "./components/Footer";
 import LuponMemberTab from "./DashboardPages/LuponMemberTab";
 import BrgyDisputesTab from "./DashboardPages/BrgyDisputesTab";
+import BarangayInstitutionsTab from "./DashboardPages/BarangayInstitutionsTab";
+import BarangayInstitution from "./pages/BarangayInstitution";
+import Login from "./pages/Login";
+import PrivateRoute from "./components/PrivateRoutes";
+import Layout from "./components/Layout";
+import { useDispatch, useSelector } from "react-redux";
+import ContactUs from "./pages/ContactUsPage";
+import ContactRequestsTab from "./DashboardPages/ContactRequestsTab";
 
 function App() {
+  const { currentUser } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
   return (
     <Router>
-      <div className="w-screen min-h-screen flex flex-col bg-white dark:bg-gray-900">
-        <Navbar />
-        <main className="flex-grow text-gray-900 dark:text-gray-100">
-          <Routes>
-            <Route path="/" element={<HomePage />} />
+      <Routes>
+        {/* Public route */}
+
+        {/* {currentUser ? <Route path="/signin" element={<Login />} /> : <></>} */}
+        <Route path="/signin" element={<Login />} />
+
+        {/* Layout route (Navbar + Footer) */}
+        <Route element={<Layout />}>
+          <Route path="/" element={<HomePage />} />
+          {/* Protected routes */}
+          <Route element={<PrivateRoute />}>
+            {/* Main pages */}
             <Route path="/residents" element={<ResidentsPage />} />
             <Route path="/services" element={<ServicesPage />} />
-            <Route path="/orgChart" element={<OrgChart />} />
+            <Route path="/bbi" element={<BarangayInstitution />} />
+            <Route path="/contact-us" element={<ContactUs />} />
+
+            {/* Dashboard with nested routes */}
             <Route path="/dashboard" element={<DashboardPage />}>
+              <Route index element={<DashboardTab />} />
               <Route path="dashboard" element={<DashboardTab />} />
               <Route path="residents" element={<ResidentTab />} />
+              <Route
+                path="barangayInstitutions"
+                element={<BarangayInstitutionsTab />}
+              />
               <Route path="documents" element={<DocumentsTab />} />
               <Route path="establishments" element={<EstablishmentTab />} />
               <Route path="pedicabs" element={<PedicabTab />} />
@@ -49,15 +72,16 @@ function App() {
               <Route path="organizations" element={<OrganizationTab />} />
               <Route path="activities" element={<ActivityTab />} />
               <Route path="officials" element={<BarangayOfficialsTab />} />
+              <Route path="contactRequests" element={<ContactRequestsTab />} />
+
+              {/* Services sub-route */}
               <Route path="services" element={<ServicesTab />}>
-                <Route path="barangay-certificate" element={<BrgyCertTab />} />
-                <Route path="barangay-clearance" element={<ClearanceTab />} />
+                <Route path="request-new" element={<BrgyCertTab />} />
               </Route>
             </Route>
-          </Routes>
-        </main>
-        <Footer />
-      </div>
+          </Route>
+        </Route>
+      </Routes>
     </Router>
   );
 }

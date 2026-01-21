@@ -15,7 +15,7 @@ export const createCertificate = async (req, res) => {
 export const getCertificates = async (req, res) => {
   try {
     const certificates = await Certificate.find()
-      .populate('requestor', 'first_name middle_name last_name cur_address, purok length_of_stay age') // populate fields from Resident
+      .populate('requestor', 'first_name middle_name last_name cur_address purok length_of_stay age precinct_no civil_status') // populate fields from Resident
       .sort({ createdAt: -1 });
     res.status(200).json(certificates);
   } catch (error) {

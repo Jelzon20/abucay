@@ -1,4 +1,6 @@
 import React, { useRef } from "react";
+import { useSelector } from "react-redux";
+const officials = useSelector((state) => state.officials.list);
 
 const CertificateTemplate = ({ formData }) => {
   const printRef = useRef();
