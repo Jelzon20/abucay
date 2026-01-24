@@ -1,18 +1,36 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Dialog } from "@headlessui/react";
-import { TextInput, Button, Label, Textarea, Select } from "flowbite-react";
+import { TextInput, Button, Textarea, Label, Select } from "flowbite-react";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { toast, Toaster } from "sonner";
 
-const AddCertModal = ({ show, onClose, onSubmit }) => {
+const UpdateCertModal = ({
+  show,
+  onClose,
+  editData,
+  setEditData,
+  onSubmit,
+}) => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [selectedResident, setSelectedResident] = useState(null);
   const [residents, setResidents] = useState([]);
   const [form, setForm] = useState({
     requestor: "",
     type: "",
     purpose: "",
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const [selectedResident, setSelectedResident] = useState(null);
+
+  useEffect(() => {
+    if (editData) {
+      setForm({
+        requestor: editData.requestor?._id || "",
+        type: editData.type || "",
+        purpose: editData.purpose || "",
+      });
+
+      setSelectedResident(editData.requestor || null);
+    }
+  }, [editData]);
 
   // Fetch residents on mount
   useEffect(() => {
@@ -32,33 +50,33 @@ const AddCertModal = ({ show, onClose, onSubmit }) => {
     }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async () => {
     setIsLoading(true);
     try {
-      const res = await fetch("/api/certs/addCertificate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
-      });
+      const response = await fetch(
+        `/api/certs/updateCertificate/${editData._id}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(form),
+        },
+      );
 
-      const data = await res.json();
-
-      if (res.ok) {
-        onClose();
-        onSubmit();
-        setForm({
-          requestor: "",
-          type: "",
-          purpose: "",
-        });
-      } else {
-        toast.error(data.error || "Something went wrong.");
+      if (!response.ok) {
+        throw new Error("Failed to update certificate record.");
       }
+
+      const result = await response.json();
+      onSubmit();
+      onClose();
     } catch (error) {
-      toast.error("Error saving record: " + error.message);
+      toast.error("Error updating certificate record");
+      console.error("Update error:", error);
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
   return (
     <Dialog open={show} onClose={onClose} className="relative z-50">
@@ -150,4 +168,4 @@ const AddCertModal = ({ show, onClose, onSubmit }) => {
   );
 };
 
-export default AddCertModal;
+export default UpdateCertModal;

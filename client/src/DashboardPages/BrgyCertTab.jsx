@@ -11,6 +11,8 @@ import UpdateActivityModal from "../modals/UpdateActivityModal";
 import DeleteActivityModal from "../modals/DeleteActivityModal";
 import AddCertModal from "../modals/AddCertModal";
 import PreviewCertModal from "../modals/PreviewCertModal";
+import UpdateCertModal from "../modals/UpdateCertModal";
+import DeleteCertModal from "../modals/DeleteCertModal";
 
 const BrgyCertTab = () => {
   const [showAddModal, setShowAddModal] = useState(false);
@@ -82,7 +84,7 @@ const BrgyCertTab = () => {
 
   const paginated = sorted.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
   const convertToCSV = (data) => {
@@ -98,7 +100,7 @@ const BrgyCertTab = () => {
             if (val instanceof Date) return val.toISOString();
             return `"${String(val || "").replace(/"/g, '""')}"`;
           })
-          .join(",")
+          .join(","),
       ),
     ];
     return csvRows.join("\n");
@@ -113,7 +115,7 @@ const BrgyCertTab = () => {
     const pad = (n) => n.toString().padStart(2, "0");
 
     const datePart = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(
-      now.getDate()
+      now.getDate(),
     )}`;
     const timePart = `${pad(now.getHours())}-${pad(now.getMinutes())}`;
 
@@ -265,7 +267,7 @@ const BrgyCertTab = () => {
         )}
         {/* Update Document Modal */}
         {editModalOpen && editData && (
-          <UpdateActivityModal
+          <UpdateCertModal
             show={editModalOpen}
             onClose={() => setEditModalOpen(false)}
             editData={editData}
@@ -278,7 +280,7 @@ const BrgyCertTab = () => {
           />
         )}
         {deleteModalOpen && (
-          <DeleteActivityModal
+          <DeleteCertModal
             show={deleteModalOpen}
             onClose={() => setDeleteModalOpen(false)}
             deleteData={deleteData}

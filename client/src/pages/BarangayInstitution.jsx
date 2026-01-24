@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import LoadingSpinner from "../components/LoadingSpinner";
 import comu1 from "../assets/comu1.jpg";
+import whiteBg from "../assets/white-bg.jpg";
 import {
   HeartIcon,
   ClipboardDocumentIcon,
@@ -25,7 +26,6 @@ const BarangayInstitution = () => {
     fetchBBIs();
   }, []);
 
-  /* DISPLAY ORDER */
   const typeOrder = [
     "Brgy. Health Worker",
     "Brgy. Nutrition Scholar",
@@ -34,18 +34,17 @@ const BarangayInstitution = () => {
     "Brgy. Aide",
     "Others",
   ];
+  const [activeType, setActiveType] = useState(typeOrder[0]);
 
-  /* ICON PER TYPE */
   const typeIcons = {
-    "Brgy. Health Worker": <HeartIcon />,
-    "Brgy. Nutrition Scholar": <ClipboardDocumentIcon />,
-    "Brgy. Service Point Officer": <UsersIcon />,
-    "Brgy. Tanod": <ShieldCheckIcon />,
-    "Brgy. Aide": <UserIcon />,
-    Others: <UsersIcon />,
+    "Brgy. Health Worker": HeartIcon,
+    "Brgy. Nutrition Scholar": ClipboardDocumentIcon,
+    "Brgy. Service Point Officer": UsersIcon,
+    "Brgy. Tanod": ShieldCheckIcon,
+    "Brgy. Aide": UserIcon,
+    Others: UsersIcon,
   };
 
-  /* GROUP DATA */
   const groupedData = data.reduce((acc, record) => {
     if (!acc[record.type]) acc[record.type] = [];
     acc[record.type].push(record);
@@ -53,80 +52,91 @@ const BarangayInstitution = () => {
   }, {});
 
   return (
-    <div className="bg-gray-100 text-gray-800">
-      {/* PAGE HERO */}
-      <section className="relative py-28 overflow-hidden">
+    <div className="bg-slate-50 text-slate-800">
+      {/* HERO */}
+      <section className="relative py-32 overflow-hidden">
         <img
           src={comu1}
           alt="Barangay-Based Institutions"
-          className="absolute inset-0 w-full h-full object-cover opacity-20"
+          className="absolute inset-0 w-full h-full object-cover opacity-30"
         />
-        <div className="absolute inset-0 bg-black/60"></div>
+        <div className="absolute inset-0 bg-gradient-to-b from-black/70 to-black/40" />
 
-        <div className="relative z-10 text-center px-4">
-          <h1 className="text-3xl md:text-5xl font-bold text-white mb-4">
+        <div className="relative z-10 text-center px-6">
+          <h1 className="text-4xl md:text-6xl font-extrabold text-white tracking-tight">
             Barangay-Based Institutions
           </h1>
-          <p className="text-white/90 max-w-2xl mx-auto text-sm md:text-base">
+          <p className="text-white/90 max-w-3xl mx-auto mt-5 text-base md:text-lg">
             Dedicated volunteers and officers working together to serve and
-            protect the community of Barangay Abucay.
+            protect the community of Barangay Abucay
           </p>
         </div>
       </section>
 
       {/* CONTENT */}
-      <section className="relative py-20 overflow-hidden">
+      <section className="relative py-24">
         <img
-          src={comu1}
+          src={whiteBg}
           alt=""
-          className="absolute inset-0 w-full h-full object-cover opacity-10"
+          className="absolute inset-0 w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-white/85"></div>
+        <div className="absolute inset-0 bg-white/90 backdrop-blur-sm" />
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4">
+        <div className="relative max-w-7xl mx-auto px-6">
           {isLoading && <LoadingSpinner />}
 
-          {typeOrder.map(
-            (type) =>
-              groupedData[type] && (
-                <div key={type} className="mb-20">
-                  {/* SECTION HEADER */}
-                  <div className="text-center mb-10">
-                    <div className="flex justify-center mb-3">
-                      {React.cloneElement(typeIcons[type], {
-                        className: "h-10 w-10 text-blue-600",
-                      })}
-                    </div>
-                    <h2 className="text-2xl font-bold">{type}</h2>
-                  </div>
+          {/* CATEGORY TABS */}
+          <div className="flex flex-wrap justify-center gap-3 mb-16">
+            {typeOrder.map((type) => (
+              <button
+                key={type}
+                onClick={() => setActiveType(type)}
+                className={`px-5 py-2.5 rounded-full text-sm font-medium transition
+            ${
+              activeType === type
+                ? "bg-blue-600 text-white shadow"
+                : "bg-white text-slate-700 hover:bg-blue-50"
+            }`}
+              >
+                {type}
+              </button>
+            ))}
+          </div>
 
-                  {/* MEMBERS GRID */}
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-6">
-                    {groupedData[type].map((record) => (
-                      <div
-                        key={record._id}
-                        className="bg-white rounded-xl shadow-md p-4 text-center hover:shadow-xl transition"
-                      >
-                        <img
-                          src={record.photo}
-                          alt={`${record.firstName} ${record.lastName}`}
-                          className="w-24 h-24 object-cover rounded-full mx-auto mb-3"
-                        />
+          {/* ACTIVE GRID */}
+          {groupedData[activeType] && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-8 justify-items-center">
+              {groupedData[activeType].map((record) => (
+                <div
+                  key={record._id}
+                  className="group bg-white w-64 rounded-2xl p-6
+                       shadow-sm hover:shadow-2xl transition-all
+                       flex flex-col items-center text-center"
+                >
+                  <img
+                    src={record.photo}
+                    alt={`${record.firstName} ${record.lastName}`}
+                    className="w-40 h-40 rounded-full object-cover
+                         ring-4 ring-white shadow-md
+                         group-hover:scale-105 transition"
+                  />
 
-                        <p className="text-sm font-semibold truncate">
-                          {record.firstName} {record.lastName}
-                        </p>
+                  <p className="mt-4 font-semibold text-sm uppercase tracking-wide">
+                    {record.firstName} {record.lastName}
+                  </p>
 
-                        {type === "Others" && record.typeOthers && (
-                          <p className="text-xs text-gray-500 truncate mt-1">
-                            {record.typeOthers}
-                          </p>
-                        )}
-                      </div>
-                    ))}
-                  </div>
+                  <p className="text-xs text-slate-500 mt-1">
+                    {record.purokAssigned}
+                  </p>
+
+                  {activeType === "Others" && record.typeOthers && (
+                    <p className="text-xs text-blue-600 mt-2 font-medium">
+                      {record.typeOthers}
+                    </p>
+                  )}
                 </div>
-              )
+              ))}
+            </div>
           )}
         </div>
       </section>

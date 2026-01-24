@@ -75,7 +75,7 @@ const ContactRequestsTab = () => {
 
   const paginated = sorted.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
   const convertToCSV = (data) => {
@@ -91,7 +91,7 @@ const ContactRequestsTab = () => {
             if (val instanceof Date) return val.toISOString();
             return `"${String(val || "").replace(/"/g, '""')}"`;
           })
-          .join(",")
+          .join(","),
       ),
     ];
     return csvRows.join("\n");
@@ -106,7 +106,7 @@ const ContactRequestsTab = () => {
     const pad = (n) => n.toString().padStart(2, "0");
 
     const datePart = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(
-      now.getDate()
+      now.getDate(),
     )}`;
     const timePart = `${pad(now.getHours())}-${pad(now.getMinutes())}`;
 
@@ -205,14 +205,15 @@ const ContactRequestsTab = () => {
                         onClick={() => handleUpdate(contactRequest)}
                         className="text-blue-600 hover:text-blue-800 dark:text-blue-300 dark:hover:text-blue-500"
                       >
+                        Edit
                         <PencilIcon className="h-5 w-5" />
                       </button>
-                      <button
+                      {/* <button
                         onClick={() => handleDelete(contactRequest)}
                         className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-500"
                       >
                         <TrashIcon className="h-5 w-5" />
-                      </button>
+                      </button> */}
                     </td>
                   </tr>
                 ))}
