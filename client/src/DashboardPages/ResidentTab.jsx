@@ -10,8 +10,11 @@ import UpdateResidentModal from "../modals/UpdateResidentModal";
 import LoadingSpinner from "../components/LoadingSpinner";
 import DeleteResidentModal from "../modals/DeleteResidentModal";
 import ViewHouseholdModal from "../modals/ViewHouseholdModal";
+import CustomFilter from "../components/CustomFilter";
 
 const ResidentsPage = () => {
+  const [showCustomFilter, setShowCustomFilter] = useState(false);
+  const [customFilters, setCustomFilters] = useState([]);
   const [residents, setResidents] = useState([]);
   const [search, setSearch] = useState("");
   const [filterStatus, setFilterStatus] = useState("");
@@ -41,6 +44,8 @@ const ResidentsPage = () => {
     fetchResidents();
   }, []);
 
+  console.log(residents[5]);
+
   const columns = [
     { label: "Photo", key: "residentPicture" },
     { label: "First Name", key: "first_name" },
@@ -49,6 +54,22 @@ const ResidentsPage = () => {
     { label: "Age", key: "age" },
     { label: "Purok", key: "purok" },
     { label: "Address", key: "cur_address" },
+    { label: "Civil Status", key: "civil_status" },
+    { label: "Contact Number", key: "contact_number" },
+    { label: "Educational Attainment", key: "education_attainment" },
+    { label: "Email", key: "email" },
+    { label: "4Ps", key: "fourps" },
+    { label: "FP Method", key: "fp_method" },
+    { label: "Gender", key: "gender" },
+    { label: "Household No.", key: "household_no" },
+    { label: "Length of Stay", key: "length_of_stay" },
+    { label: "Occupation", key: "occupation" },
+    { label: "Place of Birth", key: "place_of_birth" },
+    { label: "Precinct No", key: "precinct_no" },
+    { label: "Previous Address", key: "prev_address" },
+    { label: "Relationship", key: "relationship" },
+    { label: "Single Parent", key: "singleParent" },
+    { label: "Voter Status", key: "voter_status" },
   ];
   const calculateAge = (birthday) => {
     const birthDate = new Date(birthday);
@@ -57,15 +78,89 @@ const ResidentsPage = () => {
     return Math.abs(ageDate.getUTCFullYear() - 1970);
   };
 
+  // const filtered = residents.filter((resident) => {
+  //   const fullText = `
+  //     ${resident.first_name}
+  //     ${resident.middle_name}
+  //     ${resident.last_name}
+  //     ${resident.purok}
+  //     ${resident.cur_address}
+  //     ${resident.singleParent}
+  //   `
+  //     .toLowerCase()
+  //     .replace(/\s+/g, " ");
+
+  //   const age = calculateAge(resident.birthday);
+
+  //   const isSenior = filterSenior ? age >= 60 : true;
+  //   const isSingleParent = filterSingleParent
+  //     ? resident.singleParent === "Yes"
+  //     : true;
+
+  //   return (
+  //     fullText.includes(search.toLowerCase()) &&
+  //     (filterPurok ? resident.purok === filterPurok : true) &&
+  //     isSenior &&
+  //     isSingleParent
+  //   );
+  // });
+  const evaluateFilter = (resident, filter) => {
+    const { field, operator, value } = filter;
+
+    const fieldValue = String(resident[field] || "").toLowerCase();
+    const compareValue = value.toLowerCase();
+
+    switch (operator) {
+      case "is":
+        return fieldValue === compareValue;
+
+      case "isNot":
+        return fieldValue !== compareValue;
+
+      case "contains":
+        return fieldValue.includes(compareValue);
+
+      case "notContains":
+        return !fieldValue.includes(compareValue);
+
+      case "startsWith":
+        return fieldValue.startsWith(compareValue);
+
+      case "notStartsWith":
+        return !fieldValue.startsWith(compareValue);
+
+      default:
+        return true;
+    }
+  };
+
+  const applyCustomFilters = (resident) => {
+    if (!customFilters.length) return true;
+
+    return customFilters.reduce((result, filter, index) => {
+      if (!filter.field || !filter.value) return result;
+
+      const evaluation = evaluateFilter(resident, filter);
+
+      if (index === 0) return evaluation;
+
+      if (filter.condition === "AND") {
+        return result && evaluation;
+      } else {
+        return result || evaluation;
+      }
+    }, true);
+  };
+
   const filtered = residents.filter((resident) => {
     const fullText = `
-      ${resident.first_name}
-      ${resident.middle_name}
-      ${resident.last_name}
-      ${resident.purok}
-      ${resident.cur_address}
-      ${resident.singleParent}
-    `
+    ${resident.first_name}
+    ${resident.middle_name}
+    ${resident.last_name}
+    ${resident.purok}
+    ${resident.cur_address}
+    ${resident.singleParent}
+  `
       .toLowerCase()
       .replace(/\s+/g, " ");
 
@@ -80,10 +175,10 @@ const ResidentsPage = () => {
       fullText.includes(search.toLowerCase()) &&
       (filterPurok ? resident.purok === filterPurok : true) &&
       isSenior &&
-      isSingleParent
+      isSingleParent &&
+      applyCustomFilters(resident)
     );
   });
-
   const totalResidents = filtered.length;
 
   const sorted = [...filtered].sort((a, b) => {
@@ -101,7 +196,7 @@ const ResidentsPage = () => {
 
   const paginated = sorted.slice(
     (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
+    currentPage * itemsPerPage,
   );
 
   const convertToCSV = (data) => {
@@ -117,11 +212,13 @@ const ResidentsPage = () => {
             if (val instanceof Date) return val.toISOString();
             return `"${String(val || "").replace(/"/g, '""')}"`;
           })
-          .join(",")
+          .join(","),
       ),
     ];
     return csvRows.join("\n");
   };
+
+  const hasActiveFilters = customFilters.some((f) => f.field && f.value);
 
   const handleExport = () => {
     const csv = convertToCSV(filtered); // filtered is your final filtered+searched array
@@ -132,7 +229,7 @@ const ResidentsPage = () => {
     const pad = (n) => n.toString().padStart(2, "0");
 
     const datePart = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(
-      now.getDate()
+      now.getDate(),
     )}`;
     const timePart = `${pad(now.getHours())}-${pad(now.getMinutes())}`;
 
@@ -194,6 +291,15 @@ const ResidentsPage = () => {
           </button>
 
           <div className="flex flex-wrap gap-3">
+            <button
+              onClick={() => {
+                if (hasActiveFilters) return; // do nothing if filters exist
+                setShowCustomFilter(!showCustomFilter);
+              }}
+              className="bg-blue-600 text-white px-4 py-2 rounded-md"
+            >
+              Custom Filter
+            </button>
             <input
               type="text"
               className="p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
@@ -201,7 +307,7 @@ const ResidentsPage = () => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
-            <select
+            {/* <select
               value={filterPurok}
               onChange={(e) => setFilterPurok(e.target.value)}
               className="p-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:ring-2 focus:ring-blue-500 focus:outline-none"
@@ -212,7 +318,7 @@ const ResidentsPage = () => {
                   {purok}
                 </option>
               ))}
-            </select>
+            </select> */}
             <div className="flex items-center gap-4 mt-2">
               <label className="inline-flex items-center">
                 <input
@@ -224,7 +330,7 @@ const ResidentsPage = () => {
                 <span className="ml-2">Senior Citizen</span>
               </label>
 
-              <label className="inline-flex items-center">
+              {/* <label className="inline-flex items-center">
                 <input
                   type="checkbox"
                   checked={filterSingleParent}
@@ -232,7 +338,7 @@ const ResidentsPage = () => {
                   className="form-checkbox"
                 />
                 <span className="ml-2">Single Parent</span>
-              </label>
+              </label> */}
             </div>
             <button
               onClick={handleExport}
@@ -243,6 +349,15 @@ const ResidentsPage = () => {
             </button>
           </div>
         </div>
+        {(showCustomFilter || hasActiveFilters) && (
+          <CustomFilter
+            columns={columns}
+            onApply={(filters) => {
+              setCustomFilters(filters);
+              setCurrentPage(1);
+            }}
+          />
+        )}
 
         {/* Add Modal */}
         <AddResidentModal
@@ -286,11 +401,17 @@ const ResidentsPage = () => {
                     className="border-t hover:bg-gray-50 dark:hover:bg-gray-700 transition"
                   >
                     <td className="px-6 py-3">
-                      <img
-                        className="w-10 h-10 rounded-full"
-                        src={resident.residentPicture}
-                        alt={resident.residentPicture}
-                      />
+                      {resident.residentPicture ? (
+                        <img
+                          className="w-10 h-10 rounded-full object-cover"
+                          src={resident.residentPicture}
+                          alt="Resident"
+                        />
+                      ) : (
+                        <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-xs">
+                          N/A
+                        </div>
+                      )}
                     </td>
                     <td className="px-6 py-3">{resident.first_name}</td>
                     <td className="px-6 py-3">{resident.middle_name}</td>
@@ -300,6 +421,24 @@ const ResidentsPage = () => {
                     </td>
                     <td className="px-6 py-3">{resident.purok}</td>
                     <td className="px-6 py-3">{resident.cur_address}</td>
+                    <td className="px-6 py-3">{resident.civil_status}</td>
+                    <td className="px-6 py-3">{resident.contact_number}</td>
+                    <td className="px-6 py-3">
+                      {resident.education_attainment}
+                    </td>
+                    <td className="px-6 py-3">{resident.email}</td>
+                    <td className="px-6 py-3">{resident.fourps}</td>
+                    <td className="px-6 py-3">{resident.fp_method}</td>
+                    <td className="px-6 py-3">{resident.gender}</td>
+                    <td className="px-6 py-3">{resident.household_no}</td>
+                    <td className="px-6 py-3">{resident.length_of_stay}</td>
+                    <td className="px-6 py-3">{resident.occupation}</td>
+                    <td className="px-6 py-3">{resident.place_of_birth}</td>
+                    <td className="px-6 py-3">{resident.precinct_no}</td>
+                    <td className="px-6 py-3">{resident.prev_address}</td>
+                    <td className="px-6 py-3">{resident.relationship}</td>
+                    <td className="px-6 py-3">{resident.singleParent}</td>
+                    <td className="px-6 py-3">{resident.voter_status}</td>
                     <td className="px-6 py-3 flex gap-2">
                       <button
                         onClick={() => handleView(resident)}

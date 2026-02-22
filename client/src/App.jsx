@@ -30,6 +30,7 @@ import Layout from "./components/Layout";
 import { useDispatch, useSelector } from "react-redux";
 import ContactUs from "./pages/ContactUsPage";
 import ContactRequestsTab from "./DashboardPages/ContactRequestsTab";
+import AutoLogout from "./components/AutoLogout";
 
 function App() {
   const { currentUser } = useSelector((state) => state.auth);
@@ -82,6 +83,7 @@ function App() {
           </Route>
         </Route>
       </Routes>
+      <AutoLogout />
     </Router>
   );
 }

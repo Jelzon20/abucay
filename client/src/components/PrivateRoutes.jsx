@@ -1,9 +1,12 @@
-import { useSelector } from "react-redux";
 import { Outlet, Navigate } from "react-router-dom";
+import { getToken, isExpired } from "../utils/auth.js";
 
 export default function PrivateRoute() {
-  const { currentUser } = useSelector((state) => state.auth);
+  const token = getToken();
 
-  // return currentUser ? <Outlet /> : <Navigate to="/signin" />;
+  if (!token || isExpired()) {
+    return <Navigate to="/signin" replace />;
+  }
+
   return <Outlet />;
 }
