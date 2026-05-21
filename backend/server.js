@@ -16,6 +16,8 @@ import brgyDisputeRoutes from './routes/brgyDispute.route.js';
 import barangayInstitutionRoutes from "./routes/bbi.route.js";
 import authRoutes from "./routes/auth.route.js";
 import contactRoutes from "./routes/contact.routes.js";
+import resolutionRoutes from "./routes/resolutions.routes.js";
+import ordinanceRoutes from "./routes/ordinances.routes.js";
 
 
 import path from 'path';
@@ -46,6 +48,9 @@ app.use('/api/brgyDisputes', brgyDisputeRoutes);
 app.use('/api/bbi', barangayInstitutionRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/contact', contactRoutes);
+app.use('/api/resolutions', resolutionRoutes);
+app.use('/api/ordinances', ordinanceRoutes);
+
 
 
 

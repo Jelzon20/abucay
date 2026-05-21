@@ -14,6 +14,8 @@ import {
   ChevronDownIcon,
   ChevronUpIcon,
   MegaphoneIcon,
+  BookOpenIcon,
+  BuildingLibraryIcon,
 } from "@heroicons/react/24/outline";
 
 const Sidebar = () => {
@@ -49,6 +51,16 @@ const Sidebar = () => {
       name: "Documents",
       path: "/dashboard/documents",
       icon: <DocumentTextIcon className="h-5 w-5 mr-2" />,
+    },
+    {
+      name: "Resolutions",
+      path: "/dashboard/resolutions",
+      icon: <BookOpenIcon className="h-5 w-5 mr-2" />,
+    },
+    {
+      name: "Ordinance",
+      path: "/dashboard/ordinances",
+      icon: <BuildingLibraryIcon className="h-5 w-5 mr-2" />,
     },
     {
       name: "Establishments",

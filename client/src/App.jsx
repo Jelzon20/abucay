@@ -31,6 +31,8 @@ import { useDispatch, useSelector } from "react-redux";
 import ContactUs from "./pages/ContactUsPage";
 import ContactRequestsTab from "./DashboardPages/ContactRequestsTab";
 import AutoLogout from "./components/AutoLogout";
+import ResolutionsTab from "./DashboardPages/ResolutionsTab";
+import OrdinancesTab from "./DashboardPages/OrdinancesTab";
 
 function App() {
   const { currentUser } = useSelector((state) => state.auth);
@@ -59,6 +61,8 @@ function App() {
               <Route index element={<DashboardTab />} />
               <Route path="dashboard" element={<DashboardTab />} />
               <Route path="residents" element={<ResidentTab />} />
+              <Route path="resolutions" element={<ResolutionsTab />} />
+              <Route path="ordinances" element={<OrdinancesTab />} />
               <Route
                 path="barangayInstitutions"
                 element={<BarangayInstitutionsTab />}
