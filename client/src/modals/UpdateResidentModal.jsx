@@ -1,5 +1,5 @@
 import { Modal, Button, Tabs, Label, TextInput, Select } from "flowbite-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast, Toaster } from "sonner";
 import { Dialog } from "@headlessui/react";
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
@@ -17,6 +17,37 @@ const UpdateResidentModal = ({ resident, onClose, onUpdated }) => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [status, setStatus] = useState("");
   const [defaultImg, setDefaultImg] = useState(resident.residentPicture);
+  const [certificates, setCertificates] = useState([]);
+  const [loadingCertificates, setLoadingCertificates] = useState(false);
+
+  // ===============================
+  // ✅ FETCH CERTIFICATES BY USER ID
+  // ===============================
+  useEffect(() => {
+    const fetchCertificates = async () => {
+      if (!resident?._id) return;
+
+      try {
+        setLoadingCertificates(true);
+
+        const res = await fetch(
+          `/api/certs/getCertificatesByUserId/${resident._id}`,
+        );
+
+        if (!res.ok) throw new Error("Failed to fetch certificates");
+
+        const data = await res.json();
+        setCertificates(data);
+      } catch (err) {
+        console.error(err);
+        toast.error("Failed to load certificates");
+      } finally {
+        setLoadingCertificates(false);
+      }
+    };
+
+    fetchCertificates();
+  }, [resident]);
 
   const handleFileChange = (e) => {
     if (e.target.files[0]) {
@@ -32,7 +63,7 @@ const UpdateResidentModal = ({ resident, onClose, onUpdated }) => {
       "state_changed",
       (snapshot) => {
         const progress = Math.round(
-          (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+          (snapshot.bytesTransferred / snapshot.totalBytes) * 100,
         );
         setUploadProgress(progress);
         setStatus("Uploading...");
@@ -47,7 +78,7 @@ const UpdateResidentModal = ({ resident, onClose, onUpdated }) => {
           setFormData((prev) => ({ ...prev, residentPicture: downloadURL }));
           setStatus("Upload successful!");
         });
-      }
+      },
     );
   };
 
@@ -518,6 +549,29 @@ const UpdateResidentModal = ({ resident, onClose, onUpdated }) => {
                         />
                       </div>
                     </div>
+                  </Tabs.Item>
+
+                  {/* CERTIFICATES TAB */}
+                  <Tabs.Item title="Certificates">
+                    {loadingCertificates ? (
+                      <p>Loading certificates...</p>
+                    ) : certificates.length === 0 ? (
+                      <p className="text-gray-500">No certificates found.</p>
+                    ) : (
+                      <div className="space-y-3">
+                        {certificates.map((cert) => (
+                          <div key={cert._id} className="p-3 border rounded-lg">
+                            <p>
+                              <strong>Type:</strong> {cert.type}
+                            </p>
+                            <p>
+                              <strong>Date:</strong>{" "}
+                              {new Date(cert.createdAt).toLocaleDateString()}
+                            </p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </Tabs.Item>
                 </Tabs>
               </div>

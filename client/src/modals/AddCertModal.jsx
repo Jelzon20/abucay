@@ -1,20 +1,29 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Dialog } from "@headlessui/react";
-import { TextInput, Button, Label, Textarea, Select } from "flowbite-react";
+import { TextInput, Button, Select } from "flowbite-react";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { toast, Toaster } from "sonner";
 
 const AddCertModal = ({ show, onClose, onSubmit }) => {
   const [residents, setResidents] = useState([]);
+
   const [form, setForm] = useState({
     requestor: "",
     type: "",
     purpose: "",
   });
+
   const [isLoading, setIsLoading] = useState(false);
+
   const [selectedResident, setSelectedResident] = useState(null);
 
-  // Fetch residents on mount
+  const [showDropdown, setShowDropdown] = useState(false);
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const dropdownRef = useRef(null);
+
+  // FETCH RESIDENTS
   useEffect(() => {
     fetch("/api/residents/getResidents")
       .then((res) => res.json())
@@ -22,23 +31,52 @@ const AddCertModal = ({ show, onClose, onSubmit }) => {
       .catch((err) => console.error("Error fetching residents:", err));
   }, []);
 
+  // CLOSE DROPDOWN WHEN CLICK OUTSIDE
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  // FILTER RESIDENTS
+  const filteredResidents = residents.filter((res) => {
+    const fullName = `${res.first_name} ${
+      res.middle_name || ""
+    } ${res.last_name}`.toLowerCase();
+
+    return fullName.includes(searchTerm.toLowerCase());
+  });
+
+  // HANDLE CHANGE
   const handleChange = (e) => {
     const { id, value } = e.target;
-    setForm({ ...form, [id]: value });
 
-    if (id === "requestor") {
-      const resident = residents.find((res) => res._id === value);
-      setSelectedResident(resident || null);
-    }
+    setForm({
+      ...form,
+      [id]: value,
+    });
   };
 
+  // HANDLE SUBMIT
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     setIsLoading(true);
+
     try {
       const res = await fetch("/api/certs/addCertificate", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+        },
         body: JSON.stringify(form),
       });
 
@@ -46,24 +84,34 @@ const AddCertModal = ({ show, onClose, onSubmit }) => {
 
       if (res.ok) {
         onClose();
+
         onSubmit();
+
         setForm({
           requestor: "",
           type: "",
           purpose: "",
         });
+
+        setSearchTerm("");
+
+        setSelectedResident(null);
       } else {
         toast.error(data.error || "Something went wrong.");
       }
     } catch (error) {
       toast.error("Error saving record: " + error.message);
     }
+
     setIsLoading(false);
   };
+
   return (
     <Dialog open={show} onClose={onClose} className="relative z-50">
       <div className="fixed inset-0 bg-black/30" />
+
       <Toaster richColors position="top-center" expand={true} />
+
       {isLoading ? (
         <LoadingSpinner />
       ) : (
@@ -73,35 +121,67 @@ const AddCertModal = ({ show, onClose, onSubmit }) => {
               Create Certificate
             </Dialog.Title>
 
-            <div className="mb-4">
-              <label
-                htmlFor="incident"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
+            {/* REQUESTOR */}
+            <div className="mb-4 relative" ref={dropdownRef}>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Requestor
               </label>
-              <Select
-                id="requestor"
-                value={form.requestor}
-                onChange={handleChange}
-                required
-              >
-                <option value="">Select here</option>
-                {residents.map((res) => (
-                  <option key={res._id} value={res._id}>
-                    {res.first_name} {res.middle_name} {res.last_name}
-                  </option>
-                ))}
-              </Select>
+
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+
+                  setShowDropdown(true);
+                }}
+                onFocus={() => setShowDropdown(true)}
+                placeholder="Search resident..."
+                className="w-full border border-gray-300 rounded-lg p-2"
+              />
+
+              {showDropdown && (
+                <div className="absolute z-50 w-full bg-white border border-gray-300 rounded-lg mt-1 max-h-60 overflow-y-auto shadow-lg">
+                  {filteredResidents.length > 0 ? (
+                    filteredResidents.map((res) => {
+                      const fullName = `${res.first_name} ${
+                        res.middle_name || ""
+                      } ${res.last_name}`;
+
+                      return (
+                        <div
+                          key={res._id}
+                          onClick={() => {
+                            setForm({
+                              ...form,
+                              requestor: res._id,
+                            });
+
+                            setSelectedResident(res);
+
+                            setSearchTerm(fullName);
+
+                            setShowDropdown(false);
+                          }}
+                          className="p-2 hover:bg-blue-100 cursor-pointer"
+                        >
+                          {fullName}
+                        </div>
+                      );
+                    })
+                  ) : (
+                    <div className="p-2 text-gray-500">No resident found</div>
+                  )}
+                </div>
+              )}
             </div>
 
+            {/* CERTIFICATE TYPE */}
             <div className="mb-4">
-              <label
-                htmlFor="description"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Type of Certificate
               </label>
+
               <Select
                 id="type"
                 value={form.type}
@@ -109,36 +189,40 @@ const AddCertModal = ({ show, onClose, onSubmit }) => {
                 required
               >
                 <option value="">Select here</option>
+
                 <option value="CERTIFICATE OF INDIGENCY">
                   CERTIFICATE OF INDIGENCY
                 </option>
+
                 <option value="BARANGAY CERTIFICATION (Senior Citizen)">
                   BARANGAY CERTIFICATION (Senior Citizen)
                 </option>
+
                 <option value="BARANGAY CERTIFICATION (FIRST TIME JOB SEEKERS ACT –RA 11261)">
                   BARANGAY CERTIFICATION (FIRST TIME JOB SEEKERS ACT –RA 11261)
                 </option>
               </Select>
             </div>
+
+            {/* PURPOSE */}
             <div className="mb-4">
-              <label
-                htmlFor="incident"
-                className="block text-sm font-medium text-gray-700 mb-2"
-              >
+              <label className="block text-sm font-medium text-gray-700 mb-2">
                 Purpose
               </label>
+
               <TextInput
                 id="purpose"
                 type="text"
                 value={form.purpose}
                 onChange={handleChange}
-                placeholder="Enter incident title"
-                className="block w-full text-sm text-gray-900 border border-gray-300 rounded-lg focus:outline-none focus:ring focus:ring-blue-300"
+                placeholder="Enter purpose"
               />
             </div>
 
+            {/* BUTTONS */}
             <div className="mt-6 flex justify-end gap-2">
               <Button onClick={handleSubmit}>Submit</Button>
+
               <Button color="gray" onClick={onClose}>
                 Cancel
               </Button>

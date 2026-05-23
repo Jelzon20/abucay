@@ -15,7 +15,7 @@ export const createCertificate = async (req, res) => {
 export const getCertificates = async (req, res) => {
   try {
     const certificates = await Certificate.find()
-      .populate('requestor', 'first_name middle_name last_name cur_address purok length_of_stay age precinct_no civil_status') // populate fields from Resident
+      .populate('requestor', 'first_name middle_name last_name cur_address purok length_of_stay age precinct_no civil_status birthday') // populate fields from Resident
       .sort({ createdAt: -1 });
     res.status(200).json(certificates);
   } catch (error) {
@@ -32,6 +32,20 @@ export const getCertificateById = async (req, res) => {
     res.status(200).json(certificate);
   } catch (error) {
     res.status(500).json({ message: error.message });
+  }
+};
+
+export const getCertificatesByUserId = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const certificates = await Certificate.find({ requestor: id })
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json(certificates);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
   }
 };
 

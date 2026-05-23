@@ -8,6 +8,7 @@ import { storage } from "../firebase"; // adjust import path
 
 const AddResolutionModal = ({ show, onClose, onSubmit }) => {
   const [form, setForm] = useState({
+    docType: "",
     resolutionNo: "",
     title: "",
     description: "",
@@ -103,6 +104,7 @@ const AddResolutionModal = ({ show, onClose, onSubmit }) => {
         onSubmit();
         setForm({
           resolutionNo: "",
+          docType: "",
           title: "",
           description: "",
           dateFiled: null,
@@ -139,15 +141,30 @@ const AddResolutionModal = ({ show, onClose, onSubmit }) => {
               Add Resolution
             </Dialog.Title>
 
+            <div className="mb-4">
+              <Label htmlFor="docType">Document Type * </Label>
+              <Select
+                id="docType"
+                value={form.docType}
+                onChange={handleChange}
+                required
+              >
+                <option value="">Select Document</option>
+                <option value="Resolution">Resolution</option>
+
+                <option value="Ordinance">Ordinance</option>
+              </Select>
+            </div>
+
             {/* Resolution No */}
             <div className="mb-4">
-              <Label htmlFor="title">Resolution No.</Label>
+              <Label htmlFor="title">Document No.</Label>
               <TextInput
                 id="resolutionNo"
                 type="text"
                 value={form.resolutionNo}
                 onChange={handleChange}
-                placeholder="Enter Resolution No."
+                placeholder="Enter Document No."
               />
             </div>
 

@@ -53,14 +53,9 @@ const Sidebar = () => {
       icon: <DocumentTextIcon className="h-5 w-5 mr-2" />,
     },
     {
-      name: "Resolutions",
+      name: "Resolutions & Ordinance",
       path: "/dashboard/resolutions",
       icon: <BookOpenIcon className="h-5 w-5 mr-2" />,
-    },
-    {
-      name: "Ordinance",
-      path: "/dashboard/ordinances",
-      icon: <BuildingLibraryIcon className="h-5 w-5 mr-2" />,
     },
     {
       name: "Establishments",

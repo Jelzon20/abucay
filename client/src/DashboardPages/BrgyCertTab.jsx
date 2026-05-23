@@ -161,6 +161,8 @@ const BrgyCertTab = () => {
     return `${year}-${month}-${day} ${hours}:${minutes} ${ampm}`;
   };
 
+  console.log(previewData);
+
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 p-6">
       <Toaster richColors position="top-center" expand={true} />

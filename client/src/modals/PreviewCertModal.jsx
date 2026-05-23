@@ -32,7 +32,7 @@ const PreviewCertModal = ({ show, onClose, data }) => {
 
   const today = new Date();
   const formattedDate = `${today.getDate()}${getDaySuffix(
-    today.getDate()
+    today.getDate(),
   )} day of ${today.toLocaleString("default", {
     month: "long",
   })}, ${today.getFullYear()}`;
@@ -43,6 +43,8 @@ const PreviewCertModal = ({ show, onClose, data }) => {
   }
 
   if (!show || !resident) return null;
+
+  console.log(resident);
 
   return (
     <Dialog open={show} onClose={onClose} className="relative z-50">
@@ -140,7 +142,7 @@ const PreviewCertModal = ({ show, onClose, data }) => {
                     <p className="font-bold uppercase underline">
                       {
                         officials.find(
-                          (o) => o.position === "Barangay Secretary"
+                          (o) => o.position === "Barangay Secretary",
                         )?.name
                       }
                     </p>

@@ -1,39 +1,44 @@
 import React, { useEffect, useState } from "react";
 import { UsersIcon } from "@heroicons/react/24/solid";
 
-const ResidentChart = () => {
-  const [residentCount, setResidentCount] = useState(0);
+const ResolutionChart = () => {
+  const [resolutionCount, setResolutionCount] = useState(0);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchResidentCount = async () => {
+    const fetchResolutionCount = async () => {
       try {
-        const response = await fetch("/api/dashboard/getResidentCount");
+        const response = await fetch("/api/dashboard/getResolutionCount");
 
         if (!response.ok) {
-          throw new Error("Failed to fetch resident count");
+          throw new Error("Failed to fetch resolution and ordinances count");
         }
 
         const data = await response.json();
 
-        setResidentCount(data.totalResidents);
+        setResolutionCount(data.totalResolutions);
       } catch (error) {
-        console.error("Error fetching resident count:", error);
+        console.error(
+          "Error fetching resolutions and ordinances count:",
+          error,
+        );
       } finally {
         setLoading(false);
       }
     };
 
-    fetchResidentCount();
+    fetchResolutionCount();
   }, []);
 
   return (
     <div className="bg-white rounded-2xl shadow-md p-5 flex items-center justify-between hover:shadow-lg transition">
       <div>
-        <p className="text-gray-500 text-sm font-medium">Residents</p>
+        <p className="text-gray-500 text-sm font-medium">
+          Resolutions and Ordinances
+        </p>
 
         <h2 className="text-3xl font-bold text-gray-800 mt-2">
-          {loading ? "..." : residentCount}
+          {loading ? "..." : resolutionCount}
         </h2>
       </div>
 
@@ -44,4 +49,4 @@ const ResidentChart = () => {
   );
 };
 
-export default ResidentChart;
+export default ResolutionChart;

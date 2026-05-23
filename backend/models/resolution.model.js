@@ -2,6 +2,11 @@ import mongoose from "mongoose";
 
 const ResolutionSchema = new mongoose.Schema(
   {
+     docType: {
+      type: String,
+      required: true,
+    },
+
     resolutionNo: {
       type: String,
       required: true,

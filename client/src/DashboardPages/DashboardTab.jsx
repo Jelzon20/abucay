@@ -13,6 +13,9 @@ import Calendar from "react-calendar";
 import ResidentChart from "../charts/ResidentChart";
 import VehicleChart from "../charts/VehicleChart";
 import EstablishmentChart from "../charts/EstablishmentChart";
+import ResolutionChart from "../charts/ResolutionChart";
+import ContactRequestChart from "../charts/ContactRequestChart";
+import BrgyDisputesChart from "../charts/BrgyDisputesChart";
 
 ChartJS.register(
   CategoryScale,
@@ -20,7 +23,7 @@ ChartJS.register(
   BarElement,
   Title,
   Tooltip,
-  Legend
+  Legend,
 );
 
 const DashboardTab = () => {
@@ -51,30 +54,16 @@ const DashboardTab = () => {
   return (
     <div className="p-8 min-h-screen">
       <h1 className="text-3xl font-bold mb-10">Barangay Dashboard</h1>
-
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-12 mb-12">
         {/* Left Section */}
-        <div className="bg-white p-6 rounded-lg shadow-md">
-          <ResidentChart />
-          <VehicleChart />
-        </div>
-
-        {/* Right Section */}
-        <div className="flex flex-col gap-6">
-          {/* Quick Stats */}
-          <div className="grid grid-cols-1 mb-12">
-            <EstablishmentChart />
-            {/* {quickStats.map((stat, index) => (
-              <div
-                key={index}
-                className={`bg-white p-6 rounded-lg shadow-md flex flex-col items-center ${stat.color}`}
-              >
-                <h3 className="text-xl font-semibold mb-2">{stat.title}</h3>
-                <p className="text-3xl font-bold">{stat.count}</p>
-              </div>
-            ))} */}
-          </div>
-        </div>
+        <ResidentChart />
+        <ResolutionChart />
+        <ContactRequestChart />
+        <BrgyDisputesChart />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-12">
+        <EstablishmentChart />
+        <VehicleChart />
       </div>
     </div>
   );

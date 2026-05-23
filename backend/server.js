@@ -18,7 +18,7 @@ import authRoutes from "./routes/auth.route.js";
 import contactRoutes from "./routes/contact.routes.js";
 import resolutionRoutes from "./routes/resolutions.routes.js";
 import ordinanceRoutes from "./routes/ordinances.routes.js";
-
+import dashboardRoutes from "./routes/dashboard.routes.js";
 
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -50,7 +50,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/contact', contactRoutes);
 app.use('/api/resolutions', resolutionRoutes);
 app.use('/api/ordinances', ordinanceRoutes);
-
+app.use('/api/dashboard', dashboardRoutes);
 
 
 
